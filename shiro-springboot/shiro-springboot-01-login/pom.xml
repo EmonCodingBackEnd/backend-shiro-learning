@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <artifactId>shiro-springboot</artifactId>
+        <groupId>com.coding.shiro</groupId>
+        <version>1.0-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>shiro-springboot-01-login</artifactId>
+
+    <dependencies>
+        <!-- 定义三方包 beg -->
+        <dependency>
+            <groupId>org.apache.shiro</groupId>
+            <artifactId>shiro-core</artifactId>
+        </dependency>
+        <!-- 定义三方包 end -->
+
+
+        <!-- 定义二方包 beg -->
+        <!-- 定义二方包 end -->
+
+
+        <!-- 定义一方包 beg -->
+        <!-- 定义一方包 end -->
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>

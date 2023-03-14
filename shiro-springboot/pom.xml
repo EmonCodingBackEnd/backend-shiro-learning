@@ -13,6 +13,10 @@
     <artifactId>shiro-springboot</artifactId>
     <packaging>pom</packaging>
 
+    <modules>
+        <module>shiro-springboot-01-login</module>
+    </modules>
+
     <dependencyManagement>
         <dependencies>
             <!-- 定义三方包 beg -->
@@ -22,6 +26,12 @@
                 <version>${spring-cloud.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.shiro</groupId>
+                <artifactId>shiro-core</artifactId>
+                <version>${shiro.version}</version>
             </dependency>
             <!-- 定义三方包 end -->
 
