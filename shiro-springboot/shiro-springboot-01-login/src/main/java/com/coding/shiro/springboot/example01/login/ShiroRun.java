@@ -2,6 +2,7 @@ package com.coding.shiro.springboot.example01.login;
 
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.*;
+import org.apache.shiro.authz.UnauthorizedException;
 import org.apache.shiro.env.BasicIniEnvironment;
 import org.apache.shiro.env.Environment;
 import org.apache.shiro.mgt.SecurityManager;
@@ -24,6 +25,15 @@ public class ShiroRun {
             subject.login(token);
             System.out.println("认证结果：" + subject.isAuthenticated());
             System.out.println("登录成功！");
+            // 5、判断角色
+            boolean hasRole = subject.hasRole("role1");
+            System.out.println("用户是否有角色role1=" + hasRole);
+            // 6、判断权限
+            boolean permitted = subject.isPermitted("user:insert");
+            System.out.println("用户是否拥有权限user:insert=" + permitted);
+            // 检查失败时会抛出异常
+            subject.checkPermission("user:select");
+            System.out.println("用户是否拥有权限user:select=" + permitted);
         } catch (UnknownAccountException e) {
             e.printStackTrace();
             System.out.println("用户不存在！");
@@ -33,6 +43,9 @@ public class ShiroRun {
         } catch (AuthenticationException e) {
             e.printStackTrace();
             System.out.println("登录失败！");
+        } catch (UnauthorizedException e) {
+            e.printStackTrace();
+            System.out.println("权限验证失败");
         }
     }
 }
