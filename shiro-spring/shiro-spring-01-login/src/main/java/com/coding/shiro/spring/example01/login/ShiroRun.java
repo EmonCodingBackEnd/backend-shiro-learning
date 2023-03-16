@@ -1,4 +1,4 @@
-package com.coding.shiro.springboot.example01.login;
+package com.coding.shiro.spring.example01.login;
 
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.*;

@@ -32,6 +32,8 @@
         <spring-cloud.version>2021.0.5</spring-cloud.version>
 
         <shiro.version>1.11.0</shiro.version>
+        <mysql.version>8.0.32</mysql.version>
+        <mybatis-plus.version>3.5.3.1</mybatis-plus.version>
     </properties>
 
     <dependencyManagement>
