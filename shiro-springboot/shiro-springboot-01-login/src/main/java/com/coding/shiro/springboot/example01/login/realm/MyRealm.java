@@ -1,10 +1,13 @@
 package com.coding.shiro.springboot.example01.login.realm;
 
+import java.util.List;
+
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationInfo;
 import org.apache.shiro.authc.AuthenticationToken;
 import org.apache.shiro.authc.SimpleAuthenticationInfo;
 import org.apache.shiro.authz.AuthorizationInfo;
+import org.apache.shiro.authz.SimpleAuthorizationInfo;
 import org.apache.shiro.realm.AuthorizingRealm;
 import org.apache.shiro.subject.PrincipalCollection;
 import org.apache.shiro.util.ByteSource;
@@ -21,10 +24,25 @@ public class MyRealm extends AuthorizingRealm {
 
     private final UsersService usersService;
 
-    // 自定义授权方法
+    // 自定义授权方法：获取当前登录用户的角色、权限信息，返回给 Shiro 用来进行授权认证
     @Override
     protected AuthorizationInfo doGetAuthorizationInfo(PrincipalCollection principals) {
-        return null;
+        System.out.println("进入自定义授权方法");
+        // 1.获取用户身份信息
+        String principal = principals.getPrimaryPrincipal().toString();
+        // 2.调用业务层获取用户的角色信息（数据库）
+        List<String> roles = usersService.getUserRoleInfoByName(principal);
+        System.out.println("roles = " + roles);
+        // 2.5.调用业务层获取用户的权限信息（数据库）
+        List<String> pss = usersService.getUserRolePsInfoByName(principal);
+        System.out.println("pss = " + pss);
+        // 3.创建对象，封装当前登录用户的角色、权限信息
+        SimpleAuthorizationInfo info = new SimpleAuthorizationInfo();
+        // 4.存储角色
+        info.addRoles(roles);
+        info.addStringPermissions(pss);
+        // 5.返回信息
+        return info;
     }
 
     /*

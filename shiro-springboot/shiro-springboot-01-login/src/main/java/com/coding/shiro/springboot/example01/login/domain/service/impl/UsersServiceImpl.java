@@ -1,5 +1,7 @@
 package com.coding.shiro.springboot.example01.login.domain.service.impl;
 
+import java.util.List;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,5 +25,15 @@ public class UsersServiceImpl extends ServiceImpl<UsersMapper, Users> implements
         QueryWrapper<Users> queryWrapper = new QueryWrapper<>();
         queryWrapper.lambda().eq(Users::getName, name);
         return this.baseMapper.selectOne(queryWrapper);
+    }
+
+    @Override
+    public List<String> getUserRoleInfoByName(String name) {
+        return this.baseMapper.getUserRoleInfoMapper(name);
+    }
+
+    @Override
+    public List<String> getUserRolePsInfoByName(String name) {
+        return this.baseMapper.getUserRolePsInfoMapper(name);
     }
 }

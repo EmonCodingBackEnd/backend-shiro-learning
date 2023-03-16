@@ -76,3 +76,45 @@ Shiro支持粗粒度权限（如用户模块的所有权限）和细粒度权限
 
 权限的集合，一般情况下会赋予用户角色而不是权限，即这样用户可以拥有一组权限，赋予权限时比较方便。典型的如：项目经理、技术总监、CTO、开发工程师等都是角色，不同的角色拥有一组不同的权限。
 
+
+
+# 授权与角色认证介绍
+
+## @RequiresAuthentication
+
+验证用户是否登录，等同于方法subject.isAuthenticated()
+
+## @RequiresUser
+
+验证用户是否被记忆。
+
+登录认证成功subject.isAuthenticated()为true
+
+登录后被记忆subject.isRemembered()为true
+
+## @RequiresGuest
+
+验证是否是一个guest的请求，是否是游客的请求，此时subject.getPrincipal()为null
+
+## @RequiresRoles
+
+验证subject是否有相应角色，有角色访问方法，没有则会抛出异常AuthorizationException
+
+例如：@RequiresRoles("aRoleName")
+
+public void someMethod();
+
+只有subject有aRoleName角色才能访问方法someMethod()
+
+## @RequiresPermissions
+
+验证subject是否有相应权限，有权限访问方法，没有则会抛出异常AuthorizationException
+
+例如：@RequiresPermissions("file:read", "write:aFile.txt")
+
+public void someMethod();
+
+subject必须同时含有file:read和write:aFile.txt权限才能访问方法someMethod()
+
+
+

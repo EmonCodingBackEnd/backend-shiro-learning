@@ -1,5 +1,7 @@
 package com.coding.shiro.springboot.example01.login.domain.service;
 
+import java.util.List;
+
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.coding.shiro.springboot.example01.login.domain.entity.Users;
 
@@ -10,6 +12,28 @@ import com.coding.shiro.springboot.example01.login.domain.entity.Users;
  */
 public interface UsersService extends IService<Users> {
 
+    /**
+     * 根据用户名称获取用户的基本信息
+     * 
+     * @param name
+     * @return
+     */
     Users getUserInfoByName(String name);
+
+    /**
+     * 根据用户名称获取用户的角色信息
+     * 
+     * @param name
+     * @return
+     */
+    List<String> getUserRoleInfoByName(String name);
+
+    /**
+     * 根据用户名称获取用户的角色权限信息
+     *
+     * @param name
+     * @return
+     */
+    List<String> getUserRolePsInfoByName(String name);
 
 }
