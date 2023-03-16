@@ -1,11 +1,15 @@
 package com.coding.shiro.springboot.example01.login.domain.entity;
 
+import java.io.Serializable;
+
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import java.io.Serializable;
+
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 /**
  * 用户表
@@ -13,6 +17,8 @@ import lombok.Data;
  */
 @TableName(value ="users")
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class Users implements Serializable {
     /**
      * 编号

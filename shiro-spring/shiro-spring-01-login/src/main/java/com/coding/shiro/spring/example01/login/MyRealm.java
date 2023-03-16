@@ -37,7 +37,7 @@ public class MyRealm extends AuthenticatingRealm {
             pwdInfo,
             // 加盐值
             ByteSource.Util.bytes("salt"),
-            //
+            // 用户名称
             token.getPrincipal().toString());
         return info;
     }
