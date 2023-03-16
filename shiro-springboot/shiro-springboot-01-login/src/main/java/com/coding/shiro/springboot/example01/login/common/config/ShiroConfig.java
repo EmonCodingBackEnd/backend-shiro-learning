@@ -14,6 +14,7 @@ import org.springframework.context.annotation.Configuration;
 
 import com.coding.shiro.springboot.example01.login.realm.MyRealm;
 
+import at.pollux.thymeleaf.shiro.dialect.ShiroDialect;
 import lombok.RequiredArgsConstructor;
 
 @Configuration
@@ -80,5 +81,11 @@ public class ShiroConfig {
         shiroFilterChainDefinition.addPathDefinition("/**", "user"); // 用户过滤器
 
         return shiroFilterChainDefinition;
+    }
+
+    // 用于解析thymeleaf中的shiro:相关属性
+    @Bean
+    public ShiroDialect shiroDialect() {
+        return new ShiroDialect();
     }
 }

@@ -6,6 +6,10 @@ Shiro1.9：https://www.bilibili.com/video/BV11e4y1n7BH?p=13&spm_id_from=pageDriv
 
 Netty：https://www.bilibili.com/video/BV1DJ411m7NR/?spm_id_from=333.337.search-card.all.click&vd_source=b850b3a29a70c8eb888ce7dff776a5d1
 
+EhCache：https://www.bilibili.com/video/BV1w3411Y7RQ/?spm_id_from=333.337.search-card.all.click&vd_source=b850b3a29a70c8eb888ce7dff776a5d1
+
+https://www.bilibili.com/video/BV1zP4y1h7tD/?spm_id_from=333.337.search-card.all.click&vd_source=b850b3a29a70c8eb888ce7dff776a5d1
+
 
 
 # 概念整理
@@ -82,9 +86,13 @@ Shiro支持粗粒度权限（如用户模块的所有权限）和细粒度权限
 
 ## @RequiresAuthentication
 
+对应标签：`<shiro:authenticated>`
+
 验证用户是否登录，等同于方法subject.isAuthenticated()
 
 ## @RequiresUser
+
+对应标签：`<shiro:user>`
 
 验证用户是否被记忆。
 
@@ -94,9 +102,17 @@ Shiro支持粗粒度权限（如用户模块的所有权限）和细粒度权限
 
 ## @RequiresGuest
 
+对应标签：`<shiro:guest>`
+
 验证是否是一个guest的请求，是否是游客的请求，此时subject.getPrincipal()为null
 
 ## @RequiresRoles
+
+对应标签：`<shiro:hasRole name="admin"/>`
+
+对应标签：`<shiro:hasAnyRoles name="admin,user"/>`
+
+对应标签：`<shiro:lacksRole name="admin"/>`
 
 验证subject是否有相应角色，有角色访问方法，没有则会抛出异常AuthorizationException
 
@@ -108,6 +124,8 @@ public void someMethod();
 
 ## @RequiresPermissions
 
+对应标签：`<shiro:hasPermission name="user:create"/>`
+
 验证subject是否有相应权限，有权限访问方法，没有则会抛出异常AuthorizationException
 
 例如：@RequiresPermissions("file:read", "write:aFile.txt")
@@ -115,6 +133,22 @@ public void someMethod();
 public void someMethod();
 
 subject必须同时含有file:read和write:aFile.txt权限才能访问方法someMethod()
+
+## `<shiro:notAuthenticated>`
+
+用户已经身份验证通过，即没有调用Subject.login进行登录，包括记住我自动登录的也属于未进行身份验证。
+
+## `<shiro:principal/>`
+
+`<shiro:principal property="username"/>`
+
+相当于((User)Subject.getPrincipals()).getUsername()
+
+## <shiro:lacksPermission name="org:create"/>
+
+`<shiro:lacksPermission name="org:create"/>`
+
+如果当前Subject没有权限量显示body体内容。
 
 
 

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ehcache>
+    <!-- 磁盘保存路径 -->
+    <diskStore path="ehcache"/>
+
+    <!-- 设定缓存的默认数据过期策略 -->
+    <defaultCache
+            maxElementsInMemory="10000"
+            maxEntriesLocalDisk="10000000"
+            eternal="false"
+            overflowToDisk="true"
+            timeToIdleSeconds="120"
+            timeToLiveSeconds="120"
+            diskSpoolBufferSizeMB="30"
+            diskPersistent="false"
+            diskExpiryThreadIntervalSeconds="120"
+            memoryStoreEvictionPolicy="LRU"
+    />
+
+    <cache name="HelloWorldCache"
+           maxElementsInMemory="1000"
+           eternal="false"
+           timeToIdleSeconds="5"
+           timeToLiveSeconds="5"
+           overflowToDisk="false"
+           memoryStoreEvictionPolicy="LRU"
+    />
+
+    <!--<persistence strategy="localTempSwap"/>
+    <cache name="cacheTest" maxElementsInMemory="1000" eternal="false" overflowToDisk="true" timeToIdleSeconds="10"
+           timeToLiveSeconds="20"/>-->
+</ehcache>

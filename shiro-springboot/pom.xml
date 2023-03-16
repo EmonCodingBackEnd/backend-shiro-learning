@@ -34,6 +34,17 @@
                 <artifactId>shiro-spring-boot-web-starter</artifactId>
                 <version>${shiro.version}</version>
             </dependency>
+            <!--配置Thymeleaf与Shiro的整合依赖-->
+            <dependency>
+                <groupId>com.github.theborakompanioni</groupId>
+                <artifactId>thymeleaf-extras-shiro</artifactId>
+                <version>2.1.0</version>
+            </dependency>
+            <dependency>
+                <groupId>net.sf.ehcache</groupId>
+                <artifactId>ehcache</artifactId>
+                <version>2.10.9.2</version>
+            </dependency>
 
             <!--MySQL驱动-->
             <dependency>
