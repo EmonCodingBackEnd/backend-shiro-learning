@@ -6,6 +6,9 @@ import org.apache.shiro.realm.AuthorizingRealm;
 import org.apache.shiro.subject.PrincipalCollection;
 import org.springframework.util.ObjectUtils;
 
+import com.coding.shiro.spring.example02.service.SecurityService;
+import com.coding.shiro.spring.example02.service.impl.SecurityServiceImpl;
+
 public class DefinitionRealm extends AuthorizingRealm {
     /**
      * 获取认证信息
@@ -22,7 +25,13 @@ public class DefinitionRealm extends AuthorizingRealm {
         }
         // 传递账号和密码
         SimpleAuthenticationInfo simpleAuthenticationInfo =
-            new SimpleAuthenticationInfo(token.getPrincipal(), password, getName());
+            new SimpleAuthenticationInfo(
+                    // 身份
+                    token.getPrincipal(),
+                    // 加密口令
+                    password,
+                    // realmName
+                    getName());
         return simpleAuthenticationInfo;
     }
 

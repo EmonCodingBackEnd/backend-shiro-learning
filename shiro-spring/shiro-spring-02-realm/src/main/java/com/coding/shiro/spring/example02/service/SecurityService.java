@@ -1,4 +1,4 @@
-package com.coding.shiro.spring.example02.realm;
+package com.coding.shiro.spring.example02.service;
 
 /**
  * 模拟数据库操作服务接口

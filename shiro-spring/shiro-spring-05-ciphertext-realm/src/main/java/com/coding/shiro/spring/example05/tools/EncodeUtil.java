@@ -1,4 +1,4 @@
-package com.coding.shiro.spring.example03.client;
+package com.coding.shiro.spring.example05.tools;
 
 import org.apache.shiro.codec.Base64;
 import org.apache.shiro.codec.Hex;

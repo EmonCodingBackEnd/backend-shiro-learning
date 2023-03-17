@@ -1,16 +1,16 @@
-package com.coding.shiro.spring.example03;
-
-import java.nio.charset.StandardCharsets;
+package com.coding.shiro.spring.example03.tools;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 
-import com.coding.shiro.spring.example03.client.EncodeUtil;
+import java.nio.charset.StandardCharsets;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-public class ClientTests {
+class EncodeUtilTest {
 
     @Test
     public void testHex() {
@@ -27,4 +27,5 @@ public class ClientTests {
         String valHandler = new String(EncodeUtil.decodeBase64(flag));
         Assertions.assertEquals(val, valHandler);
     }
+
 }

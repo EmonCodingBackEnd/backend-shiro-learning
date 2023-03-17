@@ -1,4 +1,4 @@
-package com.coding.shiro.spring.example02.realm;
+package com.coding.shiro.spring.example05;
 
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.*;

@@ -1,4 +1,4 @@
-package com.coding.shiro.spring.example04.client;
+package com.coding.shiro.spring.example05.tools;
 
 import java.util.HashMap;
 import java.util.Map;
