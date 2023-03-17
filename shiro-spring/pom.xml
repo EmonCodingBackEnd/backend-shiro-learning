@@ -15,6 +15,10 @@
 
     <modules>
         <module>shiro-spring-01-login</module>
+        <module>shiro-spring-01-authenticator</module>
+        <module>shiro-spring-02-realm</module>
+        <module>shiro-spring-03-encode-decode</module>
+        <module>shiro-spring-04-hash</module>
     </modules>
 
     <dependencyManagement>

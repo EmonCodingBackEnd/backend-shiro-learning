@@ -2,7 +2,9 @@
 
 Shiro学习：
 
-Shiro1.9：https://www.bilibili.com/video/BV11e4y1n7BH?p=13&spm_id_from=pageDriver&vd_source=b850b3a29a70c8eb888ce7dff776a5d1
+Shiro1.9：
+
+https://www.bilibili.com/video/BV1j54y1t7jM/?spm_id_from=autoNext&vd_source=b850b3a29a70c8eb888ce7dff776a5d1
 
 Netty：https://www.bilibili.com/video/BV1DJ411m7NR/?spm_id_from=333.337.search-card.all.click&vd_source=b850b3a29a70c8eb888ce7dff776a5d1
 
@@ -12,55 +14,87 @@ https://www.bilibili.com/video/BV1zP4y1h7tD/?spm_id_from=333.337.search-card.all
 
 
 
-# 概念整理
+# 一、基本信息
 
-| 名称           | 含义                  |                |
-| -------------- | --------------------- | -------------- |
-| authentication | 认证                  | ɔːˌθentɪˈkeɪʃn |
-| authenticator  | 认证者                | ɔːˈθɛntɪkeɪtə  |
-| authorization  | 授权                  | ˌɔːθəraɪˈzeɪʃn |
-| authorizer     | 授权人                |                |
-| principals     | 身份，比如：用户名    | ˈprɪnsəpəlz    |
-| credentials    | 证明/凭证，比如：密码 | krəˈdenʃlz     |
-| realm          | 领域                  | relm           |
+## 官网
 
-## 授权
+https://shiro.apache.org/
 
-也叫访问控制，即在应用中控制谁访问哪些资源（如访问页面/编辑数据/页面操作等），在授权中需了解的几个关键对象：主体（Subject）、资源（Resource）、权限（Permission）、角色（Role）。
+官方文档：https://shiro.apache.org/reference.html
 
-## 主体（Subject）
+## Shiro特性图
 
-​		代表了当前“用户”，这个用户不一定是一个具体的人，与当前应用交互的任何东西都是Subject，如网络爬虫，机器人等；即一个抽象概念；所有Subject都绑定到SecurityManager，与Subject的所有交互都会委托给SecurityManager；可以把Subject认为是一个门面；SecurityManager才是实际的执行者。
+![img](images/ShiroFeatures.png)
 
-## 安全管理器（SecurityManager）
+## Shiro的3个主要概念
 
-即所有与安全有关的操作都会与SecurityManager交互；且它管理着所有Subject；可以看出它是Shiro的核心，它负责与后边介绍的其他组件进行交互，如果学习过SpringMVC，你可以把它看成DispatcherServlet前端控制器。
+Subject/SecurityManager/Realms
 
-包含：
+3个主要概念的交互图：[来源](https://shiro.apache.org/architecture.html)
 
-- 认证器（Authenticator）
+![Shiro Basic Architecture Diagram](images/ShiroBasicArchitecture.png)
 
-- 授权器（Authorizer）
+## 架构图
 
-- 会话管理器（Session Manager）
+[来源](https://shiro.apache.org/architecture.html)
 
-  ​		会话管理器，负责创建和管理用户的会话（Session）生命周期，它能够在任何环境中在本地管理用户会话，即使没有Web/Servlet/EJB容器，也一样可以保存会话。默认情况下，Shiro会检测当前环境中现有的会话机制（比如Servlet容器）进行适配，如果没有（比如独立应用程序或者非Web环境），它将会使用内置的企业会话管理器来提供相应的会话管理服务，其中还涉及一个名为SessionDAO的对象。SessionDAO负责Session的持久化操作（CRUD），允许Session数据写入到后端持久化数据库。
+![Shiro Architecture Diagram](images/ShiroArchitecture.png)
 
-- SessionDao
+## 架构图中的组件
 
-  通过SessionDao管理session数据，针对个性化的session数据存储需要使用sessionDao（如果用tomcat管理session就不用sessionDao，如果要分布式的统一管理session就要用到sessionDao）。
+### Subject（主体）
 
-- 缓存管理器（Cache Manager）
+Subject主体，外部应用与Subject进行交互，Subject将用户作为当前操作的主体，这个主体：可以是一个通过浏览器请求的用户，也可能是一个运行的程序。Subject在Shiro中是一个接口，接口中定义了很多认证授权相关的方法，外部程序通过Subject进行认证授权，而Subject是通过SecurityManager安全管理器进行认证授权。
 
-  主要对session和授权数据进行缓存（权限管理框架主要就是对认证和授权进行管理，session是在服务器缓存中的），比如将授权数据通过cacheManager进行缓存管理，和ehcache整合对缓存数据进行管理（redis是缓存框架）。
+### SecurityManager（安全管理器）
 
-- 域（realm）
+SecurityManager安全管理器，它是Shiro的核心，负责对所有的Subject进行安全管理。通过SecurityManager可以完成Subject的认证、授权等。SecurityManager是通过Authenticator进行认证，通过Authorizer进行授权，通过SessionManager进行会话管理等。SecurityManager是一个接口，继承了Authenticator、Authorizer、SessionManager这三个接口。
 
-- 密码管理（cryptography）
+### Authenticator(认证器)
 
-  比如MD5加密，提供了一套加密/解密的足迹，方便开发。比如提供常用的散列、加/解密等功能。比如MD5散列算法（MD5只有加密没有解密）。
+Authenticator即认证器[ɔːˈθɛntɪkeɪtə]，对用户登录时进行身份认证。
 
-## 会话管理器（Session Manager）
+authentication认证[ɔːˌθentɪˈkeɪʃn]
+
+principals身份，比如：用户名[ˈprɪnsəpəlz]
+
+credentials证明/凭证，比如：密码[krəˈdenʃlz]
+
+### Authorizer(授权器)
+
+Authorizer即授权器[ˌɔːθəraɪˈzə]，用户通过认证器认证通过，在访问功能时需要通过授权器判断用户是否有此功能的操作权限。
+
+authorization授权[ˌɔːθəraɪˈzeɪʃn]
+
+- 资源（Resource）
+
+在应用中用户科院访问的URL，比如访问JSP页面、查看/编辑某些数据、访问某个业务方法、打印文本等等都是资源。用户只有授权后才能访问。
+
+- 权限（Permission）
+
+安全策略中的原子授权单位，通过权限我们可以表示在应用中用户有没有操作某个资源的权利。即权限表示在应用中用户能不能访问某个资源。如：访问用户列表页面查看/新增/修改/删除用户数据（即很多时候都是CRUD式权限控制）等。权限代表了用户有没有操作某个资源的权利，即反映在某个资源上的操作允不允许。
+
+- Shiro支持的粒度
+
+Shiro支持粗粒度权限（如用户模块的所有权限）和细粒度权限（操作某个用户的权限，即实例级别的）。
+
+- 角色（Role）
+
+权限的集合，一般情况下会赋予用户角色而不是权限，即这样用户可以拥有一组权限，赋予权限时比较方便。典型的如：项目经理、技术总监、CTO、开发工程师等都是角色，不同的角色拥有一组不同的权限。
+
+### Realm(数据库读取+认证功能+授权功能实现)
+
+Realm领域[rɛlm]，相当于DataSource数据源。SecurityManager进行安全认证需要通过Realm获取用户权限数据，比如：
+
+如果用户身份数据在数据库，那么Realm就需要从数据库获取用户身份信息。
+
+注意：不要把Realm理解成只是从数据源取数据，在Realm中海油认证授权校验的相关的代码。
+
+### SessionManager(会话管理器)
+
+SessionManager会话管理，Shiro框架定义了一套会话管理，它不依赖Web容器的Session，所以Shiro可以使用在非Web应用商店，也可以将分布式应用的会话集中在一点管理，此特性可使它实现单点登录。
+
+会话管理器，负责创建和管理用户的会话（Session）生命周期，它能够在任何环境中在本地管理用户会话，即使没有Web/Servlet/EJB容器，也一样可以保存会话。默认情况下，Shiro会检测当前环境中现有的会话机制（比如Servlet容器）进行适配，如果没有（比如独立应用程序或者非Web环境），它将会使用内置的企业会话管理器来提供相应的会话管理服务，其中还涉及一个名为SessionDAO的对象。SessionDAO负责Session的持久化操作（CRUD），允许Session数据写入到后端持久化数据库。
 
 ![image-20230317110718850](images/image-20230317110718850.png)
 
@@ -87,29 +121,39 @@ SecurityManager 和 SessionManager 会话管理器决定 session来源于 Servle
 
 无论是通过request.getSession或subject.getSession获取到session，操作session，两者都是等价的。
 
-## 域（Realm）
+### SessionDAO(会话DAO)
 
-Shiro从Realm获取安全数据（如用户、角色、权限），就是说SecurityManager要验证用户身份，那么它需要从Realm获取相应的用户进行比较以确认用户身份是否合法；也需要从Realm得到用户相关的角色/权限进行验证用户是否能进行操作；可以把Realm看成DataSource，即安全数据源。
+SessionD即会话DAO，是对Session会话操作的一套接口。
 
-## 资源（Resource）
+比如：可以通过jdbc将会话存储到数据库，也可以把session存储到缓存服务器。
 
-在应用中用户科院访问的URL，比如访问JSP页面、查看/编辑某些数据、访问某个业务方法、打印文本等等都是资源。用户只有授权后才能访问。
+### CacheManager(缓存管理)
 
-## 权限（Permission）
+CacheManager缓存管理，将用户权限数据存储在缓存，这样可以提高性能。
 
-安全策略中的原子授权单位，通过权限我们可以表示在应用中用户有没有操作某个资源的权利。即权限表示在应用中用户能不能访问某个资源。如：访问用户列表页面查看/新增/修改/删除用户数据（即很多时候都是CRUD式权限控制）等。权限代表了用户有没有操作某个资源的权利，即反映在某个资源上的操作允不允许。
+### Cryptography
 
-## Shiro支持的粒度
-
-Shiro支持粗粒度权限（如用户模块的所有权限）和细粒度权限（操作某个用户的权限，即实例级别的）。
-
-## 角色（Role）
-
-权限的集合，一般情况下会赋予用户角色而不是权限，即这样用户可以拥有一组权限，赋予权限时比较方便。典型的如：项目经理、技术总监、CTO、开发工程师等都是角色，不同的角色拥有一组不同的权限。
+Cryptography密码管理[krɪpˈtɒɡrəfi]，Shiro提供了一套加密/解密的组件，方便开发。比如提供常用的散列，加/解密等功能。
 
 
 
-# 授权与角色认证介绍
+# 二、认证流程
+
+[来源](https://shiro.apache.org/authentication.html)
+
+![authentication flow diagram](images/ShiroAuthenticationSequence.png)
+
+
+
+## Realm接口
+
+![image-20230317162350819](images/image-20230317162350819.png)
+
+
+
+
+
+# 九、授权与角色认证介绍
 
 ## @RequiresAuthentication
 
