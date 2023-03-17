@@ -1,4 +1,4 @@
-package com.coding.shiro.springboot.example01.login.realm;
+package com.coding.shiro.springboot.example01.login.common.auth.realm;
 
 import java.util.List;
 
@@ -32,10 +32,10 @@ public class MyRealm extends AuthorizingRealm {
         String principal = principals.getPrimaryPrincipal().toString();
         // 2.调用业务层获取用户的角色信息（数据库）
         List<String> roles = usersService.getUserRoleInfoByName(principal);
-        System.out.println("roles = " + roles);
+        System.out.println("当前用户角色信息 = " + roles);
         // 2.5.调用业务层获取用户的权限信息（数据库）
         List<String> pss = usersService.getUserRolePsInfoByName(principal);
-        System.out.println("pss = " + pss);
+        System.out.println("当前用户权限信息 = " + pss);
         // 3.创建对象，封装当前登录用户的角色、权限信息
         SimpleAuthorizationInfo info = new SimpleAuthorizationInfo();
         // 4.存储角色

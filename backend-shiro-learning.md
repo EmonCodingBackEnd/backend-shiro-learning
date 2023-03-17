@@ -42,9 +42,9 @@ https://www.bilibili.com/video/BV1zP4y1h7tD/?spm_id_from=333.337.search-card.all
 
 - 授权器（Authorizer）
 
-- Session Manager
+- 会话管理器（Session Manager）
 
-  Web应用中一般是用Web容器（中间件tomcat）对session进行管理，shiro也提供一套session管理方式。Shiro不仅可以用于Web管理也可以用于CS管理，所以他不用Web容器的session管理。
+  ​		会话管理器，负责创建和管理用户的会话（Session）生命周期，它能够在任何环境中在本地管理用户会话，即使没有Web/Servlet/EJB容器，也一样可以保存会话。默认情况下，Shiro会检测当前环境中现有的会话机制（比如Servlet容器）进行适配，如果没有（比如独立应用程序或者非Web环境），它将会使用内置的企业会话管理器来提供相应的会话管理服务，其中还涉及一个名为SessionDAO的对象。SessionDAO负责Session的持久化操作（CRUD），允许Session数据写入到后端持久化数据库。
 
 - SessionDao
 
@@ -59,6 +59,33 @@ https://www.bilibili.com/video/BV1zP4y1h7tD/?spm_id_from=333.337.search-card.all
 - 密码管理（cryptography）
 
   比如MD5加密，提供了一套加密/解密的足迹，方便开发。比如提供常用的散列、加/解密等功能。比如MD5散列算法（MD5只有加密没有解密）。
+
+## 会话管理器（Session Manager）
+
+![image-20230317110718850](images/image-20230317110718850.png)
+
+（1）DefaultSessionManager：用于JavaSE环境
+
+（2）ServletContainerSessionManager：用于Web环境，直接使用Servlet容器的会话
+
+（3）DefaultWebSessionManager：用于Web环境，自己维护会话（不使用Servlet容器的会话管理）
+
+获得Session的方式：
+
+（1）实现
+
+```java
+Session session = SecurityUtils.getSubject().getSession();
+session.setAttribute("key", "value")
+```
+
+（2）说明
+
+Controller中的request，在shiro过滤器中的 doFilterInternal 方法，被包装成 ShiroHttpServletRequest。
+
+SecurityManager 和 SessionManager 会话管理器决定 session来源于 ServletRequest 还是由 Shiro 管理的会话。
+
+无论是通过request.getSession或subject.getSession获取到session，操作session，两者都是等价的。
 
 ## 域（Realm）
 

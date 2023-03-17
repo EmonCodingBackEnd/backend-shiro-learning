@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ehcache name="ehcache" updateCheck="false">
+    <!-- 磁盘保存路径 System.getProperty("java.io.tmpdir") -->
+    <diskStore path="java.io.tmpdir"/>
+
+    <!-- 设定缓存的默认数据过期策略 -->
+    <defaultCache
+            maxEntriesLocalHeap="1000"
+            eternal="false"
+            timeToIdleSeconds="5"
+            timeToLiveSeconds="5"
+            overflowToDisk="false">
+    </defaultCache>
+
+    <!-- 登录认证信息缓存：缓存用户角色权限 -->
+    <cache name="loginRolePsCache"
+           maxEntriesLocalHeap="2000"
+           eternal="false"
+           timeToIdleSeconds="600"
+           timeToLiveSeconds="0"
+           overflowToDisk="false"
+           statistics="true">
+    </cache>
+</ehcache>
