@@ -1,4 +1,4 @@
-package com.coding.shiro.spring.example06;
+package com.coding.shiro.spring.example07;
 
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.*;
@@ -8,7 +8,8 @@ import org.apache.shiro.env.Environment;
 import org.apache.shiro.mgt.SecurityManager;
 import org.apache.shiro.subject.Subject;
 
-public class Example06HelloShiro {
+// 【未验证通过，因为java.lang.IllegalStateException: 提交响应后无法调用sendRedirect（）】
+public class Example07HelloShiro {
     public static void main(String[] args) {
         // 1.导入权限ini文件构建权限工厂
         Environment environment = new BasicIniEnvironment("classpath:shiro.ini");

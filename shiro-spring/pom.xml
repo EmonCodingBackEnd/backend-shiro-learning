@@ -20,6 +20,7 @@
         <module>shiro-spring-04-hash</module>
         <module>shiro-spring-05-ciphertext-realm</module>
         <module>shiro-spring-06-authorization-realm</module>
+        <module>shiro-spring-07-web</module>
     </modules>
 
     <dependencyManagement>
@@ -30,6 +31,38 @@
                 <artifactId>shiro-core</artifactId>
                 <version>${shiro.version}</version>
             </dependency>
+            <dependency>
+                <groupId>org.apache.shiro</groupId>
+                <artifactId>shiro-web</artifactId>
+                <version>${shiro.version}</version>
+            </dependency>
+
+            <!--An implementation of the JSP Standard Tag Library (JSTL).-->
+            <dependency>
+                <groupId>org.apache.taglibs</groupId>
+                <artifactId>taglibs-standard-impl</artifactId>
+                <version>1.2.5</version>
+                <scope>runtime</scope>
+            </dependency>
+
+            <!--旧版2006-->
+            <!--<dependency>
+                <groupId>jstl</groupId>
+                <artifactId>jstl</artifactId>
+                <version>1.2</version>
+            </dependency>-->
+            <!--旧版2011：SpringBoot定义版-->
+            <!--<dependency>
+                <groupId>javax.servlet</groupId>
+                <artifactId>jstl</artifactId>
+            </dependency>-->
+            <!--新版2015-->
+            <!--<dependency>
+                <groupId>javax.servlet.jsp.jstl</groupId>
+                <artifactId>jstl</artifactId>
+                <version>1.2</version>
+            </dependency>-->
+
             <!-- 定义三方包 end -->
 
 

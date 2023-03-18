@@ -137,21 +137,21 @@ Cryptography密码管理[krɪpˈtɒɡrəfi]，Shiro提供了一套加密/解密�
 
 
 
-# 二、认证流程
+# 二、核心
+
+## 认证流程
 
 [来源](https://shiro.apache.org/authentication.html)
 
 ![authentication flow diagram](images/ShiroAuthenticationSequence.png)
 
-
-
-## Realm接口
+### Realm接口
 
 ![image-20230317162350819](images/image-20230317162350819.png)
 
 
 
-# 三、授权流程
+## 授权流程
 
 [来源](https://shiro.apache.org/authorization.html)
 
@@ -169,7 +169,51 @@ Cryptography密码管理[krɪpˈtɒɡrəfi]，Shiro提供了一套加密/解密�
 
 进行授权操作的前提：用户必须通过认证。
 
+# 三、Web
 
+## Shiro默认过滤器
+
+org.apache.shiro.web.filter.mgt.DefaultFilter
+
+```java
+public enum DefaultFilter {
+
+    anon(AnonymousFilter.class),
+    authc(FormAuthenticationFilter.class),
+    authcBasic(BasicHttpAuthenticationFilter.class),
+    authcBearer(BearerHttpAuthenticationFilter.class),
+    logout(LogoutFilter.class),
+    noSessionCreation(NoSessionCreationFilter.class),
+    perms(PermissionsAuthorizationFilter.class),
+    port(PortFilter.class),
+    rest(HttpMethodPermissionFilter.class),
+    roles(RolesAuthorizationFilter.class),
+    ssl(SslFilter.class),
+    user(UserFilter.class),
+    invalidRequest(InvalidRequestFilter.class);
+}
+```
+
+### 认证相关
+
+| 过滤器 | 过滤器类                 | 说明                                                         | 默认 |
+| ------ | ------------------------ | ------------------------------------------------------------ | ---- |
+| authc  | FormAuthenticationFilter | 基于表单的过滤器；如果没有登录会跳到相应的登录页面登录。示例："/**=authc" | 无   |
+| logout | LogoutFilter             | 退出过滤器，主要属性 redirectUrl 退出成功后重定向的地址，示例："/logout=logout" | /    |
+| anon   | AnonymousFilter          | 匿名过滤器，即不需要登录即可访问；一般用于静态资源过滤；示例："/static/**=anon" | 无   |
+
+
+
+### 授权相关
+
+| 过滤器 | 过滤器类                       | 说明                                                         |
+| ------ | ------------------------------ | ------------------------------------------------------------ |
+| roles  | RolesAuthorizationFilter       | 角色授权过滤器，验证用户是否拥有所有角色；主要属性：loginUrl(/login.jsp)；unauthorizedUrl：未授权后重定向的地址。示例："/admin/**=roles[admin]" |
+| perms  | PermissionsAuthorizationFilter | 权限过滤器，验证用户是否拥有所有权限；属性和roles一样。示例："/user/**=perms['user:create']" |
+| port   | PortFilter                     | 端口过滤器，主要属性：port(80)，可以通过的端口；             |
+| rest   | HttpMethodPermissionFilter     | rest风格过滤器                                               |
+| ssl    | SslFilter                      | SSL过滤器，只有请求协议是https才能通过；否则自动跳转到https  |
+| user   | UserFilter                     | 登录时勾选了RememberMe                                       |
 
 # 九、授权与角色认证介绍
 
