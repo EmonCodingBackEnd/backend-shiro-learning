@@ -14,12 +14,12 @@
     <packaging>pom</packaging>
 
     <modules>
-        <module>shiro-spring-01-login</module>
-        <module>shiro-spring-01-authenticator</module>
-        <module>shiro-spring-02-realm</module>
+        <module>shiro-spring-01-authentication</module>
+        <module>shiro-spring-02-authentication-realm</module>
         <module>shiro-spring-03-encode-decode</module>
         <module>shiro-spring-04-hash</module>
         <module>shiro-spring-05-ciphertext-realm</module>
+        <module>shiro-spring-06-authorization-realm</module>
     </modules>
 
     <dependencyManagement>
