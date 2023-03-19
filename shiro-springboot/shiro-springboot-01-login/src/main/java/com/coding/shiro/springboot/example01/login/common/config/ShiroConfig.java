@@ -18,12 +18,19 @@ import org.apache.shiro.spring.web.config.DefaultShiroFilterChainDefinition;
 import org.apache.shiro.web.mgt.CookieRememberMeManager;
 import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
 import org.apache.shiro.web.servlet.SimpleCookie;
+import org.apache.shiro.web.session.mgt.DefaultWebSessionManager;
+import org.redisson.api.RedissonClient;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 
-import com.coding.shiro.springboot.example01.login.common.auth.filter.RolesOrAuthorizationFilter;
-import com.coding.shiro.springboot.example01.login.common.auth.realm.DefinitionRealm;
+import com.coding.shiro.springboot.example01.login.common.shiro.cache.ShiroRedisCacheManager;
+import com.coding.shiro.springboot.example01.login.common.shiro.filter.RolesOrAuthorizationFilter;
+import com.coding.shiro.springboot.example01.login.common.shiro.realm.DefinitionRealm;
+import com.coding.shiro.springboot.example01.login.common.shiro.session.ShiroRedisSessionDAO;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import at.pollux.thymeleaf.shiro.dialect.ShiroDialect;
 import lombok.RequiredArgsConstructor;
@@ -71,6 +78,42 @@ public class ShiroConfig {
         return ehCacheManager;
     }
 
+    @Autowired
+    private RedissonClient redissonClient;
+    @Autowired
+    private ObjectMapper objectMapper;
+
+    @Bean
+    @Primary
+    ShiroRedisCacheManager shiroRedisCacheManager() {
+        return new ShiroRedisCacheManager(redissonClient, objectMapper);
+    }
+
+    @Bean(name = "sessionIdCookie")
+    public SimpleCookie simpleCookie() {
+        SimpleCookie simpleCookie = new SimpleCookie();
+        simpleCookie.setName("ShiroSession");
+        return simpleCookie;
+    }
+
+    @Bean
+    ShiroRedisSessionDAO shiroRedisSessionDAO() {
+        ShiroRedisSessionDAO shiroRedisSessionDAO = new ShiroRedisSessionDAO(redissonClient, objectMapper);
+        shiroRedisSessionDAO.setGlobalSessionTimeoutInMills(300 * 1000);
+        return shiroRedisSessionDAO;
+    }
+
+    @Bean
+    public DefaultWebSessionManager defaultWebSessionManager() {
+        DefaultWebSessionManager defaultWebSessionManager = new DefaultWebSessionManager();
+        defaultWebSessionManager.setSessionDAO(shiroRedisSessionDAO());
+        defaultWebSessionManager.setSessionValidationSchedulerEnabled(false);
+        defaultWebSessionManager.setSessionIdCookieEnabled(true);
+        defaultWebSessionManager.setSessionIdCookie(simpleCookie());
+        // defaultWebSessionManager.setGlobalSessionTimeout();
+        return defaultWebSessionManager;
+    }
+
     // 配置SecurityManager
     @Bean
     public DefaultWebSecurityManager webSecurityManager() {
@@ -91,7 +134,10 @@ public class ShiroConfig {
         // 4.5.设置rememberMe
         webSecurityManager.setRememberMeManager(rememberMeManager());
         // 4.6.设置ehCache缓存管理器
-        webSecurityManager.setCacheManager(ehCacheManager());
+        // webSecurityManager.setCacheManager(ehCacheManager());
+        webSecurityManager.setCacheManager(shiroRedisCacheManager());
+        // 4.7.设置Session管理器
+        webSecurityManager.setSessionManager(defaultWebSessionManager());
         // 5.返回
         return webSecurityManager;
     }
@@ -106,7 +152,8 @@ public class ShiroConfig {
         // 设置登出过滤器，其中的具体的退出代码Shiro已经替我们实现了，登出后跳转配置的loginUrl
         shiroFilterChainDefinition.addPathDefinition("/myController/logout", "logout"); // 登出过滤器，【注意】请注意顺序，logout过滤器要在authc之前
         // 使用自定义过滤器
-        shiroFilterChainDefinition.addPathDefinition("/myController/userLoginRolesCustomFilter", "myFilter[admin,otherRole]"); // 认证拦截过滤器
+        shiroFilterChainDefinition.addPathDefinition("/myController/userLoginRolesCustomFilter",
+            "myFilter[admin,otherRole]"); // 认证拦截过滤器
         // 设置需要进行登录认证的拦截范围
         shiroFilterChainDefinition.addPathDefinition("/**", "authc"); // 认证拦截过滤器
         // 添加存在用户的过滤器(rememberMe)

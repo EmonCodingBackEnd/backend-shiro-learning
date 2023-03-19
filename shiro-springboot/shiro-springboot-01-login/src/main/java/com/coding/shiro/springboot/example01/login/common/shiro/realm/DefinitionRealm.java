@@ -1,4 +1,4 @@
-package com.coding.shiro.springboot.example01.login.common.auth.realm;
+package com.coding.shiro.springboot.example01.login.common.shiro.realm;
 
 import java.util.List;
 
@@ -25,10 +25,10 @@ public class DefinitionRealm extends AuthorizingRealm {
     private final UsersService usersService;
 
     /*
-    1.自定义登录认证方法，shiro的login方法底层会调用该类的认证方法进行认证
-    2.需要配置自定义的realm生效，在ini文件中配置，或者在SpringBoot中配置
-    该方法只是获取进行对比的信息，认证逻辑还是按照shiro底层认证逻辑完成
-     */
+            1.自定义登录认证方法，shiro的login方法底层会调用该类的认证方法进行认证
+            2.需要配置自定义的realm生效，在ini文件中配置，或者在SpringBoot中配置
+            该方法只是获取进行对比的信息，认证逻辑还是按照shiro底层认证逻辑完成
+             */
     @Override
     protected AuthenticationInfo doGetAuthenticationInfo(AuthenticationToken token) throws AuthenticationException {
         // 1.获取身份信息

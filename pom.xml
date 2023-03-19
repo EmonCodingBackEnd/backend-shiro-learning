@@ -34,6 +34,7 @@
         <shiro.version>1.11.0</shiro.version>
         <mysql.version>8.0.32</mysql.version>
         <mybatis-plus.version>3.5.3.1</mybatis-plus.version>
+        <redisson.version>3.20.0</redisson.version>
     </properties>
 
     <dependencyManagement>

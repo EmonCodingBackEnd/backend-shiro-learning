@@ -1,4 +1,4 @@
-package com.coding.shiro.springboot.example01.login.common.auth.filter;
+package com.coding.shiro.springboot.example01.login.common.shiro.filter;
 
 import java.util.Set;
 
