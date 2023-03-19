@@ -6,8 +6,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
 @MapperScan("com.coding.shiro.springboot.example01.login.domain.mapper")
-public class ShiroApplication {
+public class Example01ShiroApplication {
     public static void main(String[] args) {
-        SpringApplication.run(ShiroApplication.class, args);
+        SpringApplication.run(Example01ShiroApplication.class, args);
     }
 }

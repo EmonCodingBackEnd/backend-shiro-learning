@@ -16,6 +16,7 @@ import org.apache.shiro.spring.web.config.DefaultShiroFilterChainDefinition;
 import org.apache.shiro.web.mgt.CookieRememberMeManager;
 import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
 import org.apache.shiro.web.servlet.SimpleCookie;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -93,7 +94,7 @@ public class ShiroConfig {
     }
 
     // 配置Shiro内置过滤器拦截范围：方法1
-    @Bean
+    // @Bean
     public DefaultShiroFilterChainDefinition shiroFilterChainDefinition() {
         DefaultShiroFilterChainDefinition shiroFilterChainDefinition = new DefaultShiroFilterChainDefinition();
         // 设置不认证可以访问的资源
@@ -123,11 +124,19 @@ public class ShiroConfig {
      * 1、一个URL可以配置多个Filter，使用逗号分隔<br>
      * 2、当设置多个过滤器时，全部验证通过，才视为通过<br>
      * 3、部分过滤器可指定参数，如perms，roles<br>
+     * 该方式不完全等同于定义 shiroFilterChainDefinition() ，具体参考：ShiroWebFilterConfiguration
      */
     // 配置Shiro内置过滤器拦截范围：方法2
-    // @Bean
-    public ShiroFilterFactoryBean shiroFilterFactoryBean() {
+    @Bean
+    public ShiroFilterFactoryBean shiroFilterFactoryBean(
+        @Value("#{ @environment['shiro.loginUrl'] ?: '/login.jsp' }") String loginUrl,
+        @Value("#{ @environment['shiro.successUrl'] ?: '/' }") String successUrl,
+        @Value("#{ @environment['shiro.unauthorizedUrl'] ?: null }") String unauthorizedUrl) {
         ShiroFilterFactoryBean shiroFilterFactoryBean = new ShiroFilterFactoryBean();
+
+        shiroFilterFactoryBean.setLoginUrl(loginUrl);
+        shiroFilterFactoryBean.setSuccessUrl(successUrl);
+        shiroFilterFactoryBean.setUnauthorizedUrl(unauthorizedUrl);
         shiroFilterFactoryBean.setSecurityManager(webSecurityManager());
 
         // 拦截器.
