@@ -11,7 +11,6 @@ import org.apache.shiro.subject.PrincipalCollection;
 import org.redisson.api.RBucket;
 import org.redisson.api.RedissonClient;
 
-import com.coding.shiro.springboot.example01.login.common.shiro.cache.serializer.RedisSerializer;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -21,19 +20,13 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class ShiroRedisCache<K, V> implements Cache<K, V> {
 
-    private final RedisSerializer keySerializer;
-    private final RedisSerializer valueSerializer;
-
     private final String keyPrefix;
     private final int expire;
 
     private final RedissonClient redissonClient;
     private final ObjectMapper objectMapper;
 
-    public ShiroRedisCache(RedisSerializer keySerializer, RedisSerializer valueSerializer, String keyPrefix, int expire,
-        RedissonClient redissonClient, ObjectMapper objectMapper) {
-        this.keySerializer = keySerializer;
-        this.valueSerializer = valueSerializer;
+    public ShiroRedisCache(String keyPrefix, int expire, RedissonClient redissonClient, ObjectMapper objectMapper) {
         this.keyPrefix = keyPrefix;
         this.expire = expire;
         this.redissonClient = redissonClient;

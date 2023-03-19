@@ -8,9 +8,6 @@ import org.apache.shiro.cache.CacheException;
 import org.apache.shiro.cache.CacheManager;
 import org.redisson.api.RedissonClient;
 
-import com.coding.shiro.springboot.example01.login.common.shiro.cache.serializer.ObjectSerializer;
-import com.coding.shiro.springboot.example01.login.common.shiro.cache.serializer.RedisSerializer;
-import com.coding.shiro.springboot.example01.login.common.shiro.cache.serializer.StringSerializer;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import lombok.extern.slf4j.Slf4j;
@@ -25,9 +22,6 @@ public class ShiroRedisCacheManager implements CacheManager {
     private final int expire = DEFAULT_EXPIRE;
 
     private final ConcurrentMap<String, Cache> caches = new ConcurrentHashMap<>();
-
-    private final RedisSerializer<String> keySerializer = new StringSerializer();
-    private final RedisSerializer<Object> valueSerializer = new ObjectSerializer();
 
     private final RedissonClient redissonClient;
     private final ObjectMapper objectMapper;
@@ -44,8 +38,7 @@ public class ShiroRedisCacheManager implements CacheManager {
         Cache<K, V> cache = caches.get(name);
 
         if (cache == null) {
-            cache = new ShiroRedisCache<K, V>(keySerializer, valueSerializer, keyPrefix + name + ":", expire,
-                redissonClient, objectMapper);
+            cache = new ShiroRedisCache<K, V>(keyPrefix + name + ":", expire, redissonClient, objectMapper);
             caches.put(name, cache);
         }
         return cache;

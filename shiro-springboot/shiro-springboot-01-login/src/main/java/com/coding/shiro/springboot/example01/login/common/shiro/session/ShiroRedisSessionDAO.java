@@ -11,7 +11,6 @@ import org.apache.shiro.session.mgt.eis.AbstractSessionDAO;
 import org.redisson.api.RBucket;
 import org.redisson.api.RedissonClient;
 
-import com.coding.shiro.springboot.example01.login.util.ShiroRedissionSerialize;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import lombok.extern.slf4j.Slf4j;
@@ -53,9 +52,8 @@ public class ShiroRedisSessionDAO extends AbstractSessionDAO {
         // 放入缓存中
         String key = getKey(sessionId.toString());
         log.info("doCreate=====>{}", key);
-        RBucket<String> bucket = redissonClient.getBucket(key);
-        bucket.setIfAbsent(ShiroRedissionSerialize.serialize(session),
-            Duration.ofSeconds(globalSessionTimeoutInMills / 1000));
+        RBucket<Session> bucket = redissonClient.getBucket(key);
+        bucket.setIfAbsent(session, Duration.ofSeconds(globalSessionTimeoutInMills / 1000));
         return sessionId;
     }
 
@@ -63,24 +61,24 @@ public class ShiroRedisSessionDAO extends AbstractSessionDAO {
     protected Session doReadSession(Serializable sessionId) {
         String key = getKey(sessionId.toString());
         log.info("doReadSession=====>{}", key);
-        RBucket<String> bucket = redissonClient.getBucket(key);
-        return (Session)ShiroRedissionSerialize.deserialize(bucket.get());
+        RBucket<Session> bucket = redissonClient.getBucket(key);
+        Session session = bucket.get();
+        return session;
     }
 
     @Override
     public void update(Session session) throws UnknownSessionException {
         String key = getKey(session.getId().toString());
         log.info("update=====>{}", key);
-        RBucket<String> bucket = redissonClient.getBucket(key);
-        bucket.setIfAbsent(ShiroRedissionSerialize.serialize(session),
-            Duration.ofSeconds(globalSessionTimeoutInMills / 1000));
+        RBucket<Session> bucket = redissonClient.getBucket(key);
+        bucket.setIfAbsent(session, Duration.ofSeconds(globalSessionTimeoutInMills / 1000));
     }
 
     @Override
     public void delete(Session session) {
         String key = getKey(session.getId().toString());
         log.info("delete=====>{}", key);
-        RBucket<String> bucket = redissonClient.getBucket(key);
+        RBucket<Session> bucket = redissonClient.getBucket(key);
         bucket.delete();
     }
 
