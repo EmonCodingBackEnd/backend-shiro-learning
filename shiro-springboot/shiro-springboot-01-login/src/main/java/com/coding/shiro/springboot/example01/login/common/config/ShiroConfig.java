@@ -7,6 +7,8 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import javax.servlet.Filter;
+
 import org.apache.shiro.authc.credential.HashedCredentialsMatcher;
 import org.apache.shiro.cache.ehcache.EhCacheManager;
 import org.apache.shiro.io.ResourceUtils;
@@ -20,7 +22,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import com.coding.shiro.springboot.example01.login.common.auth.realm.MyRealm;
+import com.coding.shiro.springboot.example01.login.common.auth.filter.RolesOrAuthorizationFilter;
+import com.coding.shiro.springboot.example01.login.common.auth.realm.DefinitionRealm;
 
 import at.pollux.thymeleaf.shiro.dialect.ShiroDialect;
 import lombok.RequiredArgsConstructor;
@@ -29,7 +32,7 @@ import net.sf.ehcache.CacheManager;
 @Configuration
 @RequiredArgsConstructor
 public class ShiroConfig {
-    private final MyRealm myRealm;
+    private final DefinitionRealm definitionRealm;
 
     /*@Bean
     public ModularRealmAuthenticator modularRealmAuthenticator() {
@@ -81,10 +84,10 @@ public class ShiroConfig {
         // 2.2.采用迭代3次加密
         hashedCredentialsMatcher.setHashIterations(3);
         // 3.将加密对象存储到 myRealm 中
-        myRealm.setCredentialsMatcher(hashedCredentialsMatcher);
+        definitionRealm.setCredentialsMatcher(hashedCredentialsMatcher);
         // 4.将 myRealm 存入 defaultWebSecurityManager 对象
-        myRealm.setAuthorizationCacheName("loginRolePsCache");
-        webSecurityManager.setRealms(Collections.singletonList(myRealm));
+        definitionRealm.setAuthorizationCacheName("loginRolePsCache");
+        webSecurityManager.setRealms(Collections.singletonList(definitionRealm));
         // 4.5.设置rememberMe
         webSecurityManager.setRememberMeManager(rememberMeManager());
         // 4.6.设置ehCache缓存管理器
@@ -93,8 +96,8 @@ public class ShiroConfig {
         return webSecurityManager;
     }
 
-    // 配置Shiro内置过滤器拦截范围：方法1
-    // @Bean
+    // 配置Shiro内置过滤器拦截范围：第一步
+    @Bean
     public DefaultShiroFilterChainDefinition shiroFilterChainDefinition() {
         DefaultShiroFilterChainDefinition shiroFilterChainDefinition = new DefaultShiroFilterChainDefinition();
         // 设置不认证可以访问的资源
@@ -102,6 +105,8 @@ public class ShiroConfig {
         shiroFilterChainDefinition.addPathDefinition("/myController/userLogin", "anon");
         // 设置登出过滤器，其中的具体的退出代码Shiro已经替我们实现了，登出后跳转配置的loginUrl
         shiroFilterChainDefinition.addPathDefinition("/myController/logout", "logout"); // 登出过滤器，【注意】请注意顺序，logout过滤器要在authc之前
+        // 使用自定义过滤器
+        shiroFilterChainDefinition.addPathDefinition("/myController/userLoginRolesCustomFilter", "myFilter[admin,otherRole]"); // 认证拦截过滤器
         // 设置需要进行登录认证的拦截范围
         shiroFilterChainDefinition.addPathDefinition("/**", "authc"); // 认证拦截过滤器
         // 添加存在用户的过滤器(rememberMe)
@@ -124,9 +129,10 @@ public class ShiroConfig {
      * 1、一个URL可以配置多个Filter，使用逗号分隔<br>
      * 2、当设置多个过滤器时，全部验证通过，才视为通过<br>
      * 3、部分过滤器可指定参数，如perms，roles<br>
-     * 该方式不完全等同于定义 shiroFilterChainDefinition() ，具体参考：ShiroWebFilterConfiguration
+     * 该方式不完全等同于定义 shiroFilterChainDefinition()
+     * ，具体参考：{@linkplain org.apache.shiro.spring.config.web.autoconfigure.ShiroWebFilterConfiguration}
      */
-    // 配置Shiro内置过滤器拦截范围：方法2
+    // 配置Shiro内置过滤器拦截范围：第二步；如果不需要自定义过滤器，不建议配置
     @Bean
     public ShiroFilterFactoryBean shiroFilterFactoryBean(
         @Value("#{ @environment['shiro.loginUrl'] ?: '/login.jsp' }") String loginUrl,
@@ -139,20 +145,12 @@ public class ShiroConfig {
         shiroFilterFactoryBean.setUnauthorizedUrl(unauthorizedUrl);
         shiroFilterFactoryBean.setSecurityManager(webSecurityManager());
 
-        // 拦截器.
-        Map<String, String> filterChainDefinitionMap = new LinkedHashMap<>();
-        // 设置不认证可以访问的资源
-        filterChainDefinitionMap.put("/myController/login", "anon"); // 匿名过滤器
-        filterChainDefinitionMap.put("/myController/userLogin", "anon");
-        // 设置登出过滤器，其中的具体的退出代码Shiro已经替我们实现了，登出后跳转配置的loginUrl
-        filterChainDefinitionMap.put("/myController/logout", "logout"); // 登出过滤器，【注意】请注意顺序，logout过滤器要在authc之前
-        // 设置需要进行登录认证的拦截范围
-        filterChainDefinitionMap.put("/**", "authc"); // 认证拦截过滤器
-        // 添加存在用户的过滤器(rememberMe)
-        filterChainDefinitionMap.put("/**", "user"); // 用户过滤器
+        Map<String, Filter> filterMap = new LinkedHashMap<>();
+        filterMap.put("myFilter", new RolesOrAuthorizationFilter());
+        shiroFilterFactoryBean.setFilters(filterMap);
 
         // 配置不会被拦截的链接 顺序判断
-        shiroFilterFactoryBean.setFilterChainDefinitionMap(filterChainDefinitionMap);
+        shiroFilterFactoryBean.setFilterChainDefinitionMap(shiroFilterChainDefinition().getFilterChainMap());
         return shiroFilterFactoryBean;
     }
 }

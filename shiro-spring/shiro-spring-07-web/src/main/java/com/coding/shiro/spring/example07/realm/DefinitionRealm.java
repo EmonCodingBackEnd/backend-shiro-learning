@@ -48,7 +48,7 @@ public class DefinitionRealm extends AuthorizingRealm {
             token.getPrincipal(),
             // 加密口令
             password,
-            // 干扰数据
+            // 干扰因子
             ByteSource.Util.bytes(salt),
             // realmName
             getName());

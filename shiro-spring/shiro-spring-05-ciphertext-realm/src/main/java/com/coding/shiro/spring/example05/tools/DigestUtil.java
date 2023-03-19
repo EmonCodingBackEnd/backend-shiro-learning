@@ -18,7 +18,7 @@ public class DigestUtil {
      * SHA1摘要算法
      * 
      * @param input - 明文字符串
-     * @param salt - 干扰数据
+     * @param salt - 干扰因子
      * @return - 摘要
      */
     public static String sha1(String input, String salt) {
@@ -26,7 +26,7 @@ public class DigestUtil {
     }
 
     /**
-     * 随机生成干扰数据salt
+     * 随机生成干扰因子salt
      * 
      * @return hex编码的salt
      */

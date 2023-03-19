@@ -6,6 +6,7 @@ import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationToken;
 import org.apache.shiro.authc.UsernamePasswordToken;
+import org.apache.shiro.authz.annotation.Logical;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.apache.shiro.authz.annotation.RequiresRoles;
 import org.apache.shiro.subject.Subject;
@@ -59,12 +60,20 @@ public class MyController {
     }
 
     // 登录认证验证角色
-    @RequiresRoles("admin")
+    @RequiresRoles(value = {"admin", "otherRole"}, logical = Logical.OR)
     @GetMapping("/myController/userLoginRoles")
     @ResponseBody
     public String userLoginRoles() {
         System.out.println("登录认证验证角色");
         return "验证角色成功！";
+    }
+
+    // 登录认证自定义过滤验证角色
+    @GetMapping("/myController/userLoginRolesCustomFilter")
+    @ResponseBody
+    public String userLoginRolesCustomFilter() {
+        System.out.println("登录认证自定义过滤验证角色");
+        return "自定义过滤验证角色成功！";
     }
 
     // 登录认证验证权限

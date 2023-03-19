@@ -20,30 +20,9 @@ import lombok.RequiredArgsConstructor;
 
 @Component
 @RequiredArgsConstructor
-public class MyRealm extends AuthorizingRealm {
+public class DefinitionRealm extends AuthorizingRealm {
 
     private final UsersService usersService;
-
-    // 自定义授权方法：获取当前登录用户的角色、权限信息，返回给 Shiro 用来进行授权认证
-    @Override
-    protected AuthorizationInfo doGetAuthorizationInfo(PrincipalCollection principals) {
-        System.out.println("进入自定义授权方法");
-        // 1.获取用户身份信息
-        String principal = principals.getPrimaryPrincipal().toString();
-        // 2.调用业务层获取用户的角色信息（数据库）
-        List<String> roles = usersService.getUserRoleInfoByName(principal);
-        System.out.println("当前用户角色信息 = " + roles);
-        // 2.5.调用业务层获取用户的权限信息（数据库）
-        List<String> pss = usersService.getUserRolePsInfoByName(principal);
-        System.out.println("当前用户权限信息 = " + pss);
-        // 3.创建对象，封装当前登录用户的角色、权限信息
-        SimpleAuthorizationInfo info = new SimpleAuthorizationInfo();
-        // 4.存储角色
-        info.addRoles(roles);
-        info.addStringPermissions(pss);
-        // 5.返回信息
-        return info;
-    }
 
     /*
     1.自定义登录认证方法，shiro的login方法底层会调用该类的认证方法进行认证
@@ -70,12 +49,33 @@ public class MyRealm extends AuthorizingRealm {
         AuthenticationInfo info = new SimpleAuthenticationInfo(
             // 身份信息
             token.getPrincipal(),
-            // 真实凭证信息
+            // 加密口令
             pwdInfo,
-            // 加盐值
+            // 干扰因子
             ByteSource.Util.bytes("salt"),
-            // 用户名称
-            token.getPrincipal().toString());
+            // realmName
+            getName());
+        return info;
+    }
+
+    // 自定义授权方法：获取当前登录用户的角色、权限信息，返回给 Shiro 用来进行授权认证
+    @Override
+    protected AuthorizationInfo doGetAuthorizationInfo(PrincipalCollection principals) {
+        System.out.println("进入自定义授权方法");
+        // 1.获取用户身份信息
+        String principal = principals.getPrimaryPrincipal().toString();
+        // 2.调用业务层获取用户的角色信息（数据库）
+        List<String> roles = usersService.getUserRoleInfoByName(principal);
+        System.out.println("当前用户角色信息 = " + roles);
+        // 2.5.调用业务层获取用户的权限信息（数据库）
+        List<String> pss = usersService.getUserRolePsInfoByName(principal);
+        System.out.println("当前用户权限信息 = " + pss);
+        // 3.创建对象，封装当前登录用户的角色、权限信息
+        SimpleAuthorizationInfo info = new SimpleAuthorizationInfo();
+        // 4.存储角色
+        info.addRoles(roles);
+        info.addStringPermissions(pss);
+        // 5.返回信息
         return info;
     }
 }
