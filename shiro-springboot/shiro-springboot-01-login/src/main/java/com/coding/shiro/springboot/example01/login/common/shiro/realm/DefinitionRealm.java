@@ -6,13 +6,18 @@ import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationInfo;
 import org.apache.shiro.authc.AuthenticationToken;
 import org.apache.shiro.authc.SimpleAuthenticationInfo;
+import org.apache.shiro.authc.credential.HashedCredentialsMatcher;
 import org.apache.shiro.authz.AuthorizationInfo;
 import org.apache.shiro.authz.SimpleAuthorizationInfo;
 import org.apache.shiro.realm.AuthorizingRealm;
 import org.apache.shiro.subject.PrincipalCollection;
 import org.apache.shiro.util.ByteSource;
+import org.springframework.boot.ApplicationArguments;
+import org.springframework.boot.ApplicationRunner;
 import org.springframework.stereotype.Component;
 
+import com.coding.shiro.springboot.example01.login.common.shiro.session.ShiroUser;
+import com.coding.shiro.springboot.example01.login.common.shiro.token.SimpleToken;
 import com.coding.shiro.springboot.example01.login.domain.entity.Users;
 import com.coding.shiro.springboot.example01.login.domain.service.UsersService;
 
@@ -20,7 +25,7 @@ import lombok.RequiredArgsConstructor;
 
 @Component
 @RequiredArgsConstructor
-public class DefinitionRealm extends AuthorizingRealm {
+public class DefinitionRealm extends AuthorizingRealm implements ApplicationRunner {
 
     private final UsersService usersService;
 
@@ -32,7 +37,8 @@ public class DefinitionRealm extends AuthorizingRealm {
     @Override
     protected AuthenticationInfo doGetAuthenticationInfo(AuthenticationToken token) throws AuthenticationException {
         // 1.获取身份信息
-        String principal = token.getPrincipal().toString();
+        SimpleToken simpleToken = (SimpleToken)token;
+        String principal = simpleToken.getPrincipal().toString();
         // 2.获取凭证信息
         String credentials = new String((char[])token.getCredentials());
         System.out.println("认证用户信息：" + principal + "---" + credentials);
@@ -45,10 +51,17 @@ public class DefinitionRealm extends AuthorizingRealm {
         } else {
             throw new RuntimeException("不合法的用户！");
         }
+        ShiroUser shiroUser = new ShiroUser();
+        shiroUser.setId(userInfo.getName());
+        shiroUser.setLoginName(userInfo.getName());
+        shiroUser.setRealName(userInfo.getName());
+        shiroUser.setEmail("liming20110711@163.com");
+
         // 4.创建封装校验逻辑对象，封装数据返回
         AuthenticationInfo info = new SimpleAuthenticationInfo(
             // 身份信息
-            token.getPrincipal(),
+            shiroUser,
+            // token.getPrincipal(),
             // 加密口令
             pwdInfo,
             // 干扰因子
@@ -63,7 +76,9 @@ public class DefinitionRealm extends AuthorizingRealm {
     protected AuthorizationInfo doGetAuthorizationInfo(PrincipalCollection principals) {
         System.out.println("进入自定义授权方法");
         // 1.获取用户身份信息
-        String principal = principals.getPrimaryPrincipal().toString();
+        // String principal = principals.getPrimaryPrincipal().toString();
+        ShiroUser shiroUser = (ShiroUser)principals.getPrimaryPrincipal();
+        String principal = shiroUser.getId();
         // 2.调用业务层获取用户的角色信息（数据库）
         List<String> roles = usersService.getUserRoleInfoByName(principal);
         System.out.println("当前用户角色信息 = " + roles);
@@ -77,5 +92,17 @@ public class DefinitionRealm extends AuthorizingRealm {
         info.addStringPermissions(pss);
         // 5.返回信息
         return info;
+    }
+
+    @Override
+    public void run(ApplicationArguments args) throws Exception {
+        // 创建加密对象，设置相关属性
+        HashedCredentialsMatcher hashedCredentialsMatcher = new HashedCredentialsMatcher();
+        // 采用MD5加密
+        hashedCredentialsMatcher.setHashAlgorithmName("MD5");
+        // 采用迭代3次加密
+        hashedCredentialsMatcher.setHashIterations(3);
+        // 将加密对象存储到 myRealm 中
+        setCredentialsMatcher(hashedCredentialsMatcher);
     }
 }

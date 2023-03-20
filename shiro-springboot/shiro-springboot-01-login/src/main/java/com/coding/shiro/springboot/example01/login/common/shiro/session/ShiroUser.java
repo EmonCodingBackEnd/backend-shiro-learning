@@ -1,6 +1,7 @@
 
 package com.coding.shiro.springboot.example01.login.common.shiro.session;
 
+import java.io.Serializable;
 import java.util.List;
 
 import lombok.Data;
@@ -9,7 +10,7 @@ import lombok.Data;
  * 自定义Authentication对象，使得Subject除了携带用户的登录名外还可以携带更多信息
  */
 @Data
-public class ShiroUser {
+public class ShiroUser implements Serializable {
 
     /** serialVersionUID */
     private static final long serialVersionUID = -5024855628064590607L;
@@ -101,5 +102,8 @@ public class ShiroUser {
         this.loginName = loginName;
     }
 
-
+    @Override
+    public String toString() {
+        return "ShiroUser{" + "id='" + id + '\'' + '}';
+    }
 }

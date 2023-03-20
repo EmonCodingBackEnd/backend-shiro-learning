@@ -9,7 +9,6 @@ import java.util.Map;
 
 import javax.servlet.Filter;
 
-import org.apache.shiro.authc.credential.HashedCredentialsMatcher;
 import org.apache.shiro.cache.ehcache.EhCacheManager;
 import org.apache.shiro.io.ResourceUtils;
 import org.apache.shiro.mgt.RememberMeManager;
@@ -89,17 +88,10 @@ public class ShiroConfig {
         return new ShiroRedisCacheManager(redissonClient, objectMapper);
     }
 
-    @Bean(name = "sessionIdCookie")
-    public SimpleCookie simpleCookie() {
-        SimpleCookie simpleCookie = new SimpleCookie();
-        simpleCookie.setName("ShiroSession");
-        return simpleCookie;
-    }
-
     @Bean
-    ShiroRedisSessionDAO shiroRedisSessionDAO() {
-        ShiroRedisSessionDAO shiroRedisSessionDAO = new ShiroRedisSessionDAO(redissonClient, objectMapper);
-        shiroRedisSessionDAO.setGlobalSessionTimeoutInMills(300 * 1000);
+    public ShiroRedisSessionDAO shiroRedisSessionDAO() {
+        ShiroRedisSessionDAO shiroRedisSessionDAO = new ShiroRedisSessionDAO(redissonClient);
+        shiroRedisSessionDAO.setGlobalSessionTimeoutInMills(30 * 1000);
         return shiroRedisSessionDAO;
     }
 
@@ -107,38 +99,35 @@ public class ShiroConfig {
     public DefaultWebSessionManager defaultWebSessionManager() {
         DefaultWebSessionManager defaultWebSessionManager = new DefaultWebSessionManager();
         defaultWebSessionManager.setSessionDAO(shiroRedisSessionDAO());
-        // defaultWebSessionManager.setSessionValidationSchedulerEnabled(false);
-        // defaultWebSessionManager.setSessionIdCookieEnabled(true);
-        defaultWebSessionManager.setSessionIdCookie(simpleCookie());
-        // defaultWebSessionManager.setGlobalSessionTimeout();
+        defaultWebSessionManager.setSessionValidationSchedulerEnabled(false); // 默认true
+        defaultWebSessionManager.setSessionValidationInterval(900 * 1000); // 默认1小时
+        defaultWebSessionManager.setSessionIdCookieEnabled(true);
+        defaultWebSessionManager.setGlobalSessionTimeout(20 * 1000); // 默认30分钟；注意：由于SessionDAO中的时间会被访问重置，但这里的不会被重置；超过这个时间就会被强制登出了。
+        defaultWebSessionManager.setDeleteInvalidSessions(true); // 是否删除无效的Session，默认true
+        defaultWebSessionManager.setSessionIdUrlRewritingEnabled(false); // 取消URL后面的JSESSIONID，默认false
         return defaultWebSessionManager;
     }
 
     // 配置SecurityManager
     @Bean
     public DefaultWebSecurityManager webSecurityManager() {
-        // 1.创建 defaultWebSecurityManager 对象
+        // 创建 defaultWebSecurityManager 对象
         DefaultWebSecurityManager webSecurityManager = new DefaultWebSecurityManager();
 
-        // 2.创建加密对象，设置相关属性
-        HashedCredentialsMatcher hashedCredentialsMatcher = new HashedCredentialsMatcher();
-        // 2.1.采用MD5加密
-        hashedCredentialsMatcher.setHashAlgorithmName("MD5");
-        // 2.2.采用迭代3次加密
-        hashedCredentialsMatcher.setHashIterations(3);
-        // 3.将加密对象存储到 myRealm 中
-        definitionRealm.setCredentialsMatcher(hashedCredentialsMatcher);
-        // 4.将 myRealm 存入 defaultWebSecurityManager 对象
+        // 设置缓存管理器
         definitionRealm.setAuthorizationCacheName("loginRolePsCache");
+        definitionRealm.setCacheManager(shiroRedisCacheManager());
+        // 将 myRealm 存入 defaultWebSec`urityManager 对象
         webSecurityManager.setRealms(Collections.singletonList(definitionRealm));
-        // 4.5.设置rememberMe
+        // 设置rememberMe
         webSecurityManager.setRememberMeManager(rememberMeManager());
-        // 4.6.设置ehCache缓存管理器
+        // 设置ehCache缓存管理器
         // webSecurityManager.setCacheManager(ehCacheManager());
-        webSecurityManager.setCacheManager(shiroRedisCacheManager());
-        // 4.7.设置Session管理器
+        // webSecurityManager.setCacheManager(shiroRedisCacheManager());
+        // webSecurityManager.setCacheManager(redisCacheManager);
+        // 设置Session管理器
         webSecurityManager.setSessionManager(defaultWebSessionManager());
-        // 5.返回
+
         return webSecurityManager;
     }
 

@@ -1,9 +1,9 @@
 package com.coding.shiro.springboot.example01.login.common.shiro.session;
 
 import java.io.Serializable;
-import java.time.Duration;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.shiro.session.Session;
 import org.apache.shiro.session.UnknownSessionException;
@@ -11,7 +11,7 @@ import org.apache.shiro.session.mgt.eis.AbstractSessionDAO;
 import org.redisson.api.RBucket;
 import org.redisson.api.RedissonClient;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.coding.shiro.springboot.example01.login.util.ShiroRedissionSerialize;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -28,11 +28,9 @@ public class ShiroRedisSessionDAO extends AbstractSessionDAO {
     }
 
     private final RedissonClient redissonClient;
-    private final ObjectMapper objectMapper;
 
-    public ShiroRedisSessionDAO(RedissonClient redissonClient, ObjectMapper objectMapper) {
+    public ShiroRedisSessionDAO(RedissonClient redissonClient) {
         this.redissonClient = redissonClient;
-        this.objectMapper = objectMapper;
     }
 
     private String getKey(Serializable sessionId) {
@@ -52,8 +50,9 @@ public class ShiroRedisSessionDAO extends AbstractSessionDAO {
         // 放入缓存中
         String key = getKey(sessionId.toString());
         log.info("doCreate=====>{}", key);
-        RBucket<Session> bucket = redissonClient.getBucket(key);
-        bucket.setIfAbsent(session, Duration.ofSeconds(globalSessionTimeoutInMills / 1000));
+        // key = ShiroRedissionSerialize.serialize(key);
+        RBucket<String> bucket = redissonClient.getBucket(key);
+        bucket.set(ShiroRedissionSerialize.serialize(session), globalSessionTimeoutInMills / 1000, TimeUnit.SECONDS);
         return sessionId;
     }
 
@@ -61,8 +60,10 @@ public class ShiroRedisSessionDAO extends AbstractSessionDAO {
     protected Session doReadSession(Serializable sessionId) {
         String key = getKey(sessionId.toString());
         log.info("doReadSession=====>{}", key);
-        RBucket<Session> bucket = redissonClient.getBucket(key);
-        Session session = bucket.get();
+        // key = ShiroRedissionSerialize.serialize(key);
+        RBucket<String> bucket = redissonClient.getBucket(key);
+        String sessionString = bucket.get();
+        Session session = (Session)ShiroRedissionSerialize.deserialize(sessionString);
         return session;
     }
 
@@ -70,15 +71,17 @@ public class ShiroRedisSessionDAO extends AbstractSessionDAO {
     public void update(Session session) throws UnknownSessionException {
         String key = getKey(session.getId().toString());
         log.info("update=====>{}", key);
-        RBucket<Session> bucket = redissonClient.getBucket(key);
-        bucket.setIfAbsent(session, Duration.ofSeconds(globalSessionTimeoutInMills / 1000));
+        // key = ShiroRedissionSerialize.serialize(key);
+        RBucket<String> bucket = redissonClient.getBucket(key);
+        bucket.set(ShiroRedissionSerialize.serialize(session), globalSessionTimeoutInMills / 1000, TimeUnit.SECONDS);
     }
 
     @Override
     public void delete(Session session) {
         String key = getKey(session.getId().toString());
         log.info("delete=====>{}", key);
-        RBucket<Session> bucket = redissonClient.getBucket(key);
+        // key = ShiroRedissionSerialize.serialize(key);
+        RBucket<String> bucket = redissonClient.getBucket(key);
         bucket.delete();
     }
 
