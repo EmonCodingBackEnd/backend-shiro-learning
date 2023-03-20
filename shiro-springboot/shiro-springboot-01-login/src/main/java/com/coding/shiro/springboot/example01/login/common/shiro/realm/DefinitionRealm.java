@@ -14,7 +14,6 @@ import org.apache.shiro.subject.PrincipalCollection;
 import org.apache.shiro.util.ByteSource;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
-import org.springframework.stereotype.Component;
 
 import com.coding.shiro.springboot.example01.login.common.shiro.session.ShiroUser;
 import com.coding.shiro.springboot.example01.login.common.shiro.token.SimpleToken;
@@ -23,7 +22,6 @@ import com.coding.shiro.springboot.example01.login.domain.service.UsersService;
 
 import lombok.RequiredArgsConstructor;
 
-@Component
 @RequiredArgsConstructor
 public class DefinitionRealm extends AuthorizingRealm implements ApplicationRunner {
 

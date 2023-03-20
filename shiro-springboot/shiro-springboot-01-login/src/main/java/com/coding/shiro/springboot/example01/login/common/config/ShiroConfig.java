@@ -19,7 +19,6 @@ import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
 import org.apache.shiro.web.servlet.SimpleCookie;
 import org.apache.shiro.web.session.mgt.DefaultWebSessionManager;
 import org.redisson.api.RedissonClient;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -29,6 +28,7 @@ import com.coding.shiro.springboot.example01.login.common.shiro.cache.ShiroRedis
 import com.coding.shiro.springboot.example01.login.common.shiro.filter.RolesOrAuthorizationFilter;
 import com.coding.shiro.springboot.example01.login.common.shiro.realm.DefinitionRealm;
 import com.coding.shiro.springboot.example01.login.common.shiro.session.ShiroRedisSessionDAO;
+import com.coding.shiro.springboot.example01.login.domain.service.UsersService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import at.pollux.thymeleaf.shiro.dialect.ShiroDialect;
@@ -38,7 +38,9 @@ import net.sf.ehcache.CacheManager;
 @Configuration
 @RequiredArgsConstructor
 public class ShiroConfig {
-    private final DefinitionRealm definitionRealm;
+    private final UsersService usersService;
+    private final RedissonClient redissonClient;
+    private final ObjectMapper objectMapper;
 
     /*@Bean
     public ModularRealmAuthenticator modularRealmAuthenticator() {
@@ -48,6 +50,7 @@ public class ShiroConfig {
         return modularRealmAuthenticator;
     }*/
 
+    @Bean
     public RememberMeManager rememberMeManager() {
         SimpleCookie cookie = new SimpleCookie("rememberMe");
         // 设置跨域
@@ -77,15 +80,20 @@ public class ShiroConfig {
         return ehCacheManager;
     }
 
-    @Autowired
-    private RedissonClient redissonClient;
-    @Autowired
-    private ObjectMapper objectMapper;
-
     @Bean
     @Primary
     ShiroRedisCacheManager shiroRedisCacheManager() {
         return new ShiroRedisCacheManager(redissonClient, objectMapper);
+    }
+
+    @Bean
+    public DefinitionRealm definitionRealm() {
+        DefinitionRealm definitionRealm = new DefinitionRealm(usersService);
+        // 设置缓存管理器
+        definitionRealm.setAuthorizationCacheName("loginRolePsCache");
+        // definitionRealm.setCacheManager(ehCacheManager());
+        definitionRealm.setCacheManager(shiroRedisCacheManager());
+        return definitionRealm;
     }
 
     @Bean
@@ -114,17 +122,13 @@ public class ShiroConfig {
         // 创建 defaultWebSecurityManager 对象
         DefaultWebSecurityManager webSecurityManager = new DefaultWebSecurityManager();
 
-        // 设置缓存管理器
-        definitionRealm.setAuthorizationCacheName("loginRolePsCache");
-        definitionRealm.setCacheManager(shiroRedisCacheManager());
         // 将 myRealm 存入 defaultWebSec`urityManager 对象
-        webSecurityManager.setRealms(Collections.singletonList(definitionRealm));
+        webSecurityManager.setRealms(Collections.singletonList(definitionRealm()));
         // 设置rememberMe
         webSecurityManager.setRememberMeManager(rememberMeManager());
         // 设置ehCache缓存管理器
         // webSecurityManager.setCacheManager(ehCacheManager());
         // webSecurityManager.setCacheManager(shiroRedisCacheManager());
-        // webSecurityManager.setCacheManager(redisCacheManager);
         // 设置Session管理器
         webSecurityManager.setSessionManager(defaultWebSessionManager());
 
