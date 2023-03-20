@@ -1,4 +1,4 @@
-package com.coding.shiro.springboot.example01.common.shiro.session;
+package com.coding.shiro.springboot.example02.common.shiro.session;
 
 import java.io.Serializable;
 import java.util.Collection;
@@ -11,7 +11,7 @@ import org.apache.shiro.session.mgt.eis.AbstractSessionDAO;
 import org.redisson.api.RBucket;
 import org.redisson.api.RedissonClient;
 
-import com.coding.shiro.springboot.example01.common.shiro.serializer.ShiroRedissionSerialize;
+import com.coding.shiro.springboot.example02.common.shiro.serializer.ShiroRedissionSerialize;
 
 import lombok.extern.slf4j.Slf4j;
 
