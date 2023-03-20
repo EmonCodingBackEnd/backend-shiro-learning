@@ -6,6 +6,10 @@ Shiro1.9：
 
 https://www.bilibili.com/video/BV1j54y1t7jM?p=57&spm_id_from=pageDriver&vd_source=b850b3a29a70c8eb888ce7dff776a5d1
 
+实现自己的shiro-redis：
+
+https://blog.csdn.net/feiying0canglang/article/details/120319186
+
 Netty：https://www.bilibili.com/video/BV1DJ411m7NR/?spm_id_from=333.337.search-card.all.click&vd_source=b850b3a29a70c8eb888ce7dff776a5d1
 
 EhCache：https://www.bilibili.com/video/BV1w3411Y7RQ/?spm_id_from=333.337.search-card.all.click&vd_source=b850b3a29a70c8eb888ce7dff776a5d1
