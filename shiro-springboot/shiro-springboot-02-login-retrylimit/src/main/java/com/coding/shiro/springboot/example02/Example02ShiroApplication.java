@@ -1,4 +1,4 @@
-package com.coding.shiro.springboot.example01;
+package com.coding.shiro.springboot.example02;
 
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
@@ -6,8 +6,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
 @MapperScan("com.coding.shiro.springboot.example02.domain.mapper")
-public class Example01ShiroApplication {
+public class Example02ShiroApplication {
     public static void main(String[] args) {
-        SpringApplication.run(Example01ShiroApplication.class, args);
+        SpringApplication.run(Example02ShiroApplication.class, args);
     }
 }

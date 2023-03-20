@@ -1,4 +1,4 @@
-package com.coding.shiro.springboot.example01.common.shiro.filter;
+package com.coding.shiro.springboot.example02.common.shiro.filter;
 
 import java.util.Set;
 

@@ -1,4 +1,4 @@
-package com.coding.shiro.springboot.example01.common.shiro.cache;
+package com.coding.shiro.springboot.example02.common.shiro.cache;
 
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;

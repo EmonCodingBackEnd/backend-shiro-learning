@@ -1,4 +1,4 @@
-package com.coding.shiro.springboot.example01.common.config;
+package com.coding.shiro.springboot.example02.common.config;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -24,8 +24,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 
-import com.coding.shiro.springboot.example01.common.shiro.cache.ShiroRedisCacheManager;
-import com.coding.shiro.springboot.example01.common.shiro.filter.RolesOrAuthorizationFilter;
+import com.coding.shiro.springboot.example02.common.shiro.cache.ShiroRedisCacheManager;
+import com.coding.shiro.springboot.example02.common.shiro.filter.RolesOrAuthorizationFilter;
 import com.coding.shiro.springboot.example02.common.shiro.realm.DefinitionRealm;
 import com.coding.shiro.springboot.example02.common.shiro.session.ShiroRedisSessionDAO;
 import com.coding.shiro.springboot.example02.domain.service.UsersService;

@@ -1,4 +1,4 @@
-package com.coding.shiro.springboot.example01.common.shiro.cache.exception;
+package com.coding.shiro.springboot.example02.common.shiro.cache.exception;
 
 public class SerializationException extends Exception {
     public SerializationException(String msg) {
