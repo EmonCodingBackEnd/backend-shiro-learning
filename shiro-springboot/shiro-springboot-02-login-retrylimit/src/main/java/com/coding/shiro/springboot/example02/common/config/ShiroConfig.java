@@ -21,6 +21,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 
 import com.coding.shiro.springboot.example02.common.shiro.cache.ShiroRedisCacheManager;
+import com.coding.shiro.springboot.example02.common.shiro.filter.KickedOutAuthorizationFilter;
 import com.coding.shiro.springboot.example02.common.shiro.filter.RolesOrAuthorizationFilter;
 import com.coding.shiro.springboot.example02.common.shiro.realm.DefinitionRealm;
 import com.coding.shiro.springboot.example02.common.shiro.session.ShiroRedisSessionDAO;
@@ -70,7 +71,7 @@ public class ShiroConfig {
     @Bean
     public ShiroRedisSessionDAO shiroRedisSessionDAO() {
         ShiroRedisSessionDAO shiroRedisSessionDAO = new ShiroRedisSessionDAO(redissonClient);
-        shiroRedisSessionDAO.setGlobalSessionTimeoutInMills(30 * 1000);
+        shiroRedisSessionDAO.setGlobalSessionTimeoutInMills(300 * 1000);
         return shiroRedisSessionDAO;
     }
 
@@ -81,7 +82,7 @@ public class ShiroConfig {
         defaultWebSessionManager.setSessionValidationSchedulerEnabled(false); // 默认true
         defaultWebSessionManager.setSessionValidationInterval(900 * 1000); // 默认1小时
         defaultWebSessionManager.setSessionIdCookieEnabled(true);
-        defaultWebSessionManager.setGlobalSessionTimeout(20 * 1000); // 默认30分钟；注意：由于SessionDAO中的时间会被访问重置，但这里的不会被重置；超过这个时间就会被强制登出了。
+        defaultWebSessionManager.setGlobalSessionTimeout(600 * 1000); // 默认30分钟；注意：由于SessionDAO中的时间会被访问重置，但这里的不会被重置；超过这个时间就会被强制登出了。
         defaultWebSessionManager.setDeleteInvalidSessions(true); // 是否删除无效的Session，默认true
         defaultWebSessionManager.setSessionIdUrlRewritingEnabled(false); // 取消URL后面的JSESSIONID，默认false
         return defaultWebSessionManager;
@@ -117,9 +118,9 @@ public class ShiroConfig {
         shiroFilterChainDefinition.addPathDefinition("/myController/logout", "logout"); // 登出过滤器，【注意】请注意顺序，logout过滤器要在authc之前
         // 使用自定义过滤器
         shiroFilterChainDefinition.addPathDefinition("/myController/userLoginRolesCustomFilter",
-            "myFilter[admin,otherRole]"); // 认证拦截过滤器
+            "role-or[admin,otherRole]"); // 认证拦截过滤器
         // 设置需要进行登录认证的拦截范围
-        shiroFilterChainDefinition.addPathDefinition("/**", "authc"); // 认证拦截过滤器
+        shiroFilterChainDefinition.addPathDefinition("/**", "kicked-out,authc"); // 认证拦截过滤器
         // 添加存在用户的过滤器(rememberMe)
         shiroFilterChainDefinition.addPathDefinition("/**", "user"); // 用户过滤器
 
@@ -157,7 +158,9 @@ public class ShiroConfig {
         shiroFilterFactoryBean.setSecurityManager(webSecurityManager());
 
         Map<String, Filter> filterMap = new LinkedHashMap<>();
-        filterMap.put("myFilter", new RolesOrAuthorizationFilter());
+        filterMap.put("role-or", new RolesOrAuthorizationFilter());
+        filterMap.put("kicked-out",
+            new KickedOutAuthorizationFilter(redissonClient, shiroRedisSessionDAO(), defaultWebSessionManager()));
         shiroFilterFactoryBean.setFilters(filterMap);
 
         // 配置不会被拦截的链接 顺序判断

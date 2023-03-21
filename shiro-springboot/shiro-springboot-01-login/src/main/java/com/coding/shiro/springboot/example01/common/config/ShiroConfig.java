@@ -146,7 +146,7 @@ public class ShiroConfig {
         shiroFilterChainDefinition.addPathDefinition("/myController/logout", "logout"); // 登出过滤器，【注意】请注意顺序，logout过滤器要在authc之前
         // 使用自定义过滤器
         shiroFilterChainDefinition.addPathDefinition("/myController/userLoginRolesCustomFilter",
-            "myFilter[admin,otherRole]"); // 认证拦截过滤器
+            "role-or[admin,otherRole]"); // 认证拦截过滤器
         // 设置需要进行登录认证的拦截范围
         shiroFilterChainDefinition.addPathDefinition("/**", "authc"); // 认证拦截过滤器
         // 添加存在用户的过滤器(rememberMe)
@@ -186,7 +186,7 @@ public class ShiroConfig {
         shiroFilterFactoryBean.setSecurityManager(webSecurityManager());
 
         Map<String, Filter> filterMap = new LinkedHashMap<>();
-        filterMap.put("myFilter", new RolesOrAuthorizationFilter());
+        filterMap.put("role-or", new RolesOrAuthorizationFilter());
         shiroFilterFactoryBean.setFilters(filterMap);
 
         // 配置不会被拦截的链接 顺序判断

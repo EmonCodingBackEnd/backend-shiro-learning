@@ -12,12 +12,12 @@ import org.redisson.api.RedissonClient;
 import lombok.RequiredArgsConstructor;
 
 /**
- * 自定义密码比较器
+ * 自定义密码比较器：限制密码重试次数
  */
 @RequiredArgsConstructor
 public class RetryLimitCredentialsMatcher extends HashedCredentialsMatcher {
 
-    public static final String DEFAULT_LOGIN_KEY_PREFIX = "shiro:login:";
+    public static final String DEFAULT_LOGIN_KEY_PREFIX = "shiro:login:retryNum";
     private final String keyPrefix = DEFAULT_LOGIN_KEY_PREFIX;
 
     private final RedissonClient redissonClient;
