@@ -60,7 +60,7 @@ public class ShiroConfig {
 
     @Bean
     public DefinitionRealm definitionRealm() {
-        DefinitionRealm definitionRealm = new DefinitionRealm(usersService);
+        DefinitionRealm definitionRealm = new DefinitionRealm(usersService, redissonClient);
         // 设置缓存管理器
         definitionRealm.setAuthorizationCacheName("loginRolePsCache");
         definitionRealm.setCacheManager(shiroRedisCacheManager());

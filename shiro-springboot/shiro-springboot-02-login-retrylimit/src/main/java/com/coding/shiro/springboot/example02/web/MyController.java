@@ -40,8 +40,9 @@ public class MyController {
             session.setAttribute("user", token.getPrincipal().toString());
             return "main";
         } catch (AuthenticationException e) {
+            session.setAttribute("msg", e.getMessage());
             e.printStackTrace();
-            return "登录失败！";
+            return "login";
         }
     }
 

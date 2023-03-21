@@ -12,13 +12,15 @@ import org.apache.shiro.authz.SimpleAuthorizationInfo;
 import org.apache.shiro.realm.AuthorizingRealm;
 import org.apache.shiro.subject.PrincipalCollection;
 import org.apache.shiro.util.ByteSource;
+import org.redisson.api.RedissonClient;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 
-import com.coding.shiro.springboot.example02.domain.entity.Users;
-import com.coding.shiro.springboot.example02.domain.service.UsersService;
+import com.coding.shiro.springboot.example02.common.shiro.matcher.RetryLimitCredentialsMatcher;
 import com.coding.shiro.springboot.example02.common.shiro.session.ShiroUser;
 import com.coding.shiro.springboot.example02.common.shiro.token.SimpleToken;
+import com.coding.shiro.springboot.example02.domain.entity.Users;
+import com.coding.shiro.springboot.example02.domain.service.UsersService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -26,6 +28,7 @@ import lombok.RequiredArgsConstructor;
 public class DefinitionRealm extends AuthorizingRealm implements ApplicationRunner {
 
     private final UsersService usersService;
+    private final RedissonClient redissonClient;
 
     /*
             1.自定义登录认证方法，shiro的login方法底层会调用该类的认证方法进行认证
@@ -95,7 +98,7 @@ public class DefinitionRealm extends AuthorizingRealm implements ApplicationRunn
     @Override
     public void run(ApplicationArguments args) throws Exception {
         // 创建加密对象，设置相关属性
-        HashedCredentialsMatcher hashedCredentialsMatcher = new HashedCredentialsMatcher();
+        HashedCredentialsMatcher hashedCredentialsMatcher = new RetryLimitCredentialsMatcher(redissonClient);
         // 采用MD5加密
         hashedCredentialsMatcher.setHashAlgorithmName("MD5");
         // 采用迭代3次加密
