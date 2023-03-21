@@ -10,7 +10,7 @@
         <version>1.0-SNAPSHOT</version>
     </parent>
 
-    <artifactId>shiro-springboot-02-login-retrylimit</artifactId>
+    <artifactId>shiro-springboot-02-retrylimit</artifactId>
 
     <dependencies>
         <!-- 定义三方包 beg -->

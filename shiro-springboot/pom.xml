@@ -15,7 +15,8 @@
 
     <modules>
         <module>shiro-springboot-01-login</module>
-        <module>shiro-springboot-02-login-retrylimit</module>
+        <module>shiro-springboot-02-retrylimit</module>
+        <module>shiro-springboot-03-jwt</module>
     </modules>
 
     <dependencyManagement>

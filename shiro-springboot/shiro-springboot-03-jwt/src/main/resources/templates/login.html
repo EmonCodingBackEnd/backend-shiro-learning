@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<h1>Shiro登录认证</h1>
+<br/>
+登录结果：<span th:text="${session.msg?:'登录成功'}"></span>
+<br/>
+<form action="/myController/userLogin">
+    <div>用户名：<input type="text" name="name" value="emon"></div>
+    <div>密码：<input type="text" name="pwd" value="emon123"></div>
+    <div><input type="submit" value="登录"></div>
+</form>
+</body>
+</html>
