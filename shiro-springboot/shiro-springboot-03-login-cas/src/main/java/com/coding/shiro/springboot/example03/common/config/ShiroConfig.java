@@ -1,4 +1,4 @@
-package com.coding.shiro.springboot.example02.common.config;
+package com.coding.shiro.springboot.example03.common.config;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Collections;
@@ -18,13 +18,12 @@ import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Primary;
 
-import com.coding.shiro.springboot.example02.common.shiro.cache.ShiroRedisCacheManager;
-import com.coding.shiro.springboot.example02.common.shiro.filter.RolesOrAuthorizationFilter;
-import com.coding.shiro.springboot.example02.common.shiro.realm.DefinitionRealm;
-import com.coding.shiro.springboot.example02.common.shiro.session.ShiroRedisSessionDAO;
-import com.coding.shiro.springboot.example02.domain.service.UsersService;
+import com.coding.shiro.springboot.example03.common.shiro.cache.ShiroRedisCacheManager;
+import com.coding.shiro.springboot.example03.common.shiro.filter.RolesOrAuthorizationFilter;
+import com.coding.shiro.springboot.example03.common.shiro.realm.DefinitionRealm;
+import com.coding.shiro.springboot.example03.common.shiro.session.ShiroRedisSessionDAO;
+import com.coding.shiro.springboot.example03.domain.service.UsersService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import at.pollux.thymeleaf.shiro.dialect.ShiroDialect;
@@ -53,7 +52,6 @@ public class ShiroConfig {
     }
 
     @Bean
-    @Primary
     ShiroRedisCacheManager shiroRedisCacheManager() {
         return new ShiroRedisCacheManager(redissonClient, objectMapper);
     }
@@ -97,9 +95,6 @@ public class ShiroConfig {
         webSecurityManager.setRealms(Collections.singletonList(definitionRealm()));
         // 设置rememberMe
         webSecurityManager.setRememberMeManager(rememberMeManager());
-        // 设置ehCache缓存管理器
-        // webSecurityManager.setCacheManager(ehCacheManager());
-        // webSecurityManager.setCacheManager(shiroRedisCacheManager());
         // 设置Session管理器
         webSecurityManager.setSessionManager(defaultWebSessionManager());
 

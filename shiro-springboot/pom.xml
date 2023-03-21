@@ -16,6 +16,7 @@
     <modules>
         <module>shiro-springboot-01-login</module>
         <module>shiro-springboot-02-login-retrylimit</module>
+        <module>shiro-springboot-03-login-cas</module>
     </modules>
 
     <dependencyManagement>
@@ -39,6 +40,11 @@
             <dependency>
                 <groupId>org.apache.shiro</groupId>
                 <artifactId>shiro-ehcache</artifactId>
+                <version>${shiro.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.shiro</groupId>
+                <artifactId>shiro-cas</artifactId>
                 <version>${shiro.version}</version>
             </dependency>
             <!--Shiro整合Redis缓存-->
