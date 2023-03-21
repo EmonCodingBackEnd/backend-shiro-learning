@@ -33,7 +33,7 @@ public class KickedOutAuthorizationFilter extends AccessControlFilter {
     public static final String DEFAULT_LOGIN_KEY_PREFIX = "shiro:login:concurrency:";
     private final String keyPrefix = DEFAULT_LOGIN_KEY_PREFIX;
 
-    private static final Long CONCURRENCY_NUM = 4L;
+    private static final Long CONCURRENCY_NUM = 2L;
 
     private final RedissonClient redissonClient;
     private final ShiroRedisSessionDAO shiroRedisSessionDAO;

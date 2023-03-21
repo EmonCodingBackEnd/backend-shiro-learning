@@ -1,18 +1,14 @@
 package com.coding.shiro.springboot.example02.common.config;
 
-import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
 import javax.servlet.Filter;
 
-import org.apache.shiro.mgt.RememberMeManager;
 import org.apache.shiro.spring.web.ShiroFilterFactoryBean;
 import org.apache.shiro.spring.web.config.DefaultShiroFilterChainDefinition;
-import org.apache.shiro.web.mgt.CookieRememberMeManager;
 import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
-import org.apache.shiro.web.servlet.SimpleCookie;
 import org.apache.shiro.web.session.mgt.DefaultWebSessionManager;
 import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Value;
@@ -37,21 +33,6 @@ public class ShiroConfig {
     private final UsersService usersService;
     private final RedissonClient redissonClient;
     private final ObjectMapper objectMapper;
-
-    @Bean
-    public RememberMeManager rememberMeManager() {
-        SimpleCookie cookie = new SimpleCookie("rememberMe");
-        // 设置跨域
-        // cookie.setDomain("*");
-        cookie.setPath("/");
-        cookie.setHttpOnly(true);
-        cookie.setMaxAge(30 * 24 * 60 * 60);
-
-        CookieRememberMeManager cookieRememberMeManager = new CookieRememberMeManager();
-        cookieRememberMeManager.setCookie(cookie);
-        cookieRememberMeManager.setCipherKey("1234567890987654".getBytes(StandardCharsets.UTF_8));
-        return cookieRememberMeManager;
-    }
 
     @Bean
     @Primary
@@ -96,8 +77,6 @@ public class ShiroConfig {
 
         // 将 myRealm 存入 defaultWebSec`urityManager 对象
         webSecurityManager.setRealms(Collections.singletonList(definitionRealm()));
-        // 设置rememberMe
-        webSecurityManager.setRememberMeManager(rememberMeManager());
         // 设置ehCache缓存管理器
         // webSecurityManager.setCacheManager(ehCacheManager());
         // webSecurityManager.setCacheManager(shiroRedisCacheManager());
@@ -121,8 +100,6 @@ public class ShiroConfig {
             "role-or[admin,otherRole]"); // 认证拦截过滤器
         // 设置需要进行登录认证的拦截范围
         shiroFilterChainDefinition.addPathDefinition("/**", "kicked-out,authc"); // 认证拦截过滤器
-        // 添加存在用户的过滤器(rememberMe)
-        shiroFilterChainDefinition.addPathDefinition("/**", "user"); // 用户过滤器
 
         return shiroFilterChainDefinition;
     }

@@ -7,7 +7,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 /**
- * 自定义tooken
+ * 自定义token
  */
 @Getter
 @Setter

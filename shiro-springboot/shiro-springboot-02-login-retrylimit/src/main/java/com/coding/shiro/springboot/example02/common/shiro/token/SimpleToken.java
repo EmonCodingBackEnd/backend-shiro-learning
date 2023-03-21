@@ -7,7 +7,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 /**
- * 自定义tooken
+ * 自定义token
  */
 @Getter
 @Setter
@@ -17,8 +17,8 @@ public class SimpleToken extends UsernamePasswordToken {
 
     private String tokenType;
 
-    public SimpleToken(String username, String password, boolean rememberMe, String tokenType) {
-        super(username, password, rememberMe);
+    public SimpleToken(String username, String password, String tokenType) {
+        super(username, password);
         this.tokenType = tokenType;
     }
 }
