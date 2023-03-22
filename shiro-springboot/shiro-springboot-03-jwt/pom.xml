@@ -50,6 +50,11 @@
             <groupId>org.redisson</groupId>
             <artifactId>redisson-spring-data-27</artifactId>
         </dependency>
+
+        <dependency>
+            <groupId>com.auth0</groupId>
+            <artifactId>java-jwt</artifactId>
+        </dependency>
         <!-- 定义三方包 end -->
 
 

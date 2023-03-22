@@ -6,9 +6,6 @@ import java.util.Map;
 
 import javax.servlet.Filter;
 
-import com.coding.shiro.springboot.example03.common.shiro.cache.ShiroRedisCacheManager;
-import com.coding.shiro.springboot.example03.common.shiro.realm.DefinitionRealm;
-import com.coding.shiro.springboot.example03.domain.service.UsersService;
 import org.apache.shiro.spring.web.ShiroFilterFactoryBean;
 import org.apache.shiro.spring.web.config.DefaultShiroFilterChainDefinition;
 import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
@@ -17,11 +14,13 @@ import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Primary;
 
+import com.coding.shiro.springboot.example03.common.shiro.cache.ShiroRedisCacheManager;
 import com.coding.shiro.springboot.example03.common.shiro.filter.KickedOutAuthorizationFilter;
 import com.coding.shiro.springboot.example03.common.shiro.filter.RolesOrAuthorizationFilter;
+import com.coding.shiro.springboot.example03.common.shiro.realm.DefinitionRealm;
 import com.coding.shiro.springboot.example03.common.shiro.session.ShiroRedisSessionDAO;
+import com.coding.shiro.springboot.example03.domain.service.UsersService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import at.pollux.thymeleaf.shiro.dialect.ShiroDialect;
@@ -35,7 +34,6 @@ public class ShiroConfig {
     private final ObjectMapper objectMapper;
 
     @Bean
-    @Primary
     ShiroRedisCacheManager shiroRedisCacheManager() {
         return new ShiroRedisCacheManager(redissonClient, objectMapper);
     }
@@ -63,7 +61,7 @@ public class ShiroConfig {
         defaultWebSessionManager.setSessionValidationSchedulerEnabled(false); // 默认true
         defaultWebSessionManager.setSessionValidationInterval(900 * 1000); // 默认1小时
         defaultWebSessionManager.setSessionIdCookieEnabled(true);
-        defaultWebSessionManager.setGlobalSessionTimeout(600 * 1000); // 默认30分钟；注意：由于SessionDAO中的时间会被访问重置，但这里的不会被重置；超过这个时间就会被强制登出了。
+        defaultWebSessionManager.setGlobalSessionTimeout(600 * 1000); // 默认30分钟；全局超时时间，可以被Subject.getSession().setTimeout(long)覆盖
         defaultWebSessionManager.setDeleteInvalidSessions(true); // 是否删除无效的Session，默认true
         defaultWebSessionManager.setSessionIdUrlRewritingEnabled(false); // 取消URL后面的JSESSIONID，默认false
         return defaultWebSessionManager;
