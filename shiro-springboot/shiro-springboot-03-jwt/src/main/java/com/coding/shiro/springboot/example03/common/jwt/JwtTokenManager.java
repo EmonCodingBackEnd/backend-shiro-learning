@@ -19,7 +19,6 @@ import com.auth0.jwt.exceptions.JWTDecodeException;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.exceptions.SignatureVerificationException;
 import com.auth0.jwt.exceptions.TokenExpiredException;
-import com.auth0.jwt.interfaces.Claim;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.auth0.jwt.interfaces.JWTVerifier;
 import com.auth0.jwt.interfaces.Verification;
@@ -37,6 +36,22 @@ import lombok.extern.slf4j.Slf4j;
 public class JwtTokenManager {
 
     private final JwtProperties jwtProperties;
+
+    /** Token在HTTP请求头中存在的具体属性. */
+    public static final String TOKEN_HEADER = "Authorization";
+
+    /** Token值前缀. */
+    public static final String TOKEN_PREFIX = "Bearer "; // ˈbeərə(r)
+
+    public static final String $X_APP_SESSION_EXP = "$x-app-session-exp";
+
+    public String fetchToken(String authHeader) {
+        String authToken = null;
+        if (authHeader != null && authHeader.startsWith(TOKEN_PREFIX)) {
+            authToken = authHeader.substring(TOKEN_PREFIX.length()); // The part after "Bearer "
+        }
+        return authToken;
+    }
 
     /**
      * 签发令牌
@@ -118,18 +133,13 @@ public class JwtTokenManager {
      * @param jwtToken - 令牌
      * @return - 令牌中携带的非隐私数据
      */
-    public Map<String, Claim> decodeJwtToken(String jwtToken) {
+    public DecodedJWT decodeJwtToken(String jwtToken) {
         try {
             DecodedJWT jwt = JWT.decode(jwtToken);
-            return jwt.getClaims();
-        } catch (JWTVerificationException e) {
-            if (e instanceof JWTDecodeException) {
-                log.error("解码失败", e);
-            } else {
-                // Invalid signature/claims
-                log.error("异常", e);
-            }
-            return null;
+            return jwt;
+        } catch (JWTDecodeException e) {
+            log.error("解码失败", e);
+            throw e;
         }
     }
 
@@ -166,4 +176,9 @@ public class JwtTokenManager {
         }
     }
 
+    public static void main(String[] args) {
+        JwtTokenManager jwtTokenManager = new JwtTokenManager(new JwtProperties());
+        String jwtToken = jwtTokenManager.issueJwtToken("61e3af70-8333-4f94-8654-6116b4abdbe6", "emon", null, 3600 * 1000);
+        System.out.println(jwtToken);
+    }
 }

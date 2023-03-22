@@ -9,16 +9,18 @@ import javax.servlet.Filter;
 import org.apache.shiro.spring.web.ShiroFilterFactoryBean;
 import org.apache.shiro.spring.web.config.DefaultShiroFilterChainDefinition;
 import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
-import org.apache.shiro.web.session.mgt.DefaultWebSessionManager;
 import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import com.coding.shiro.springboot.example03.common.jwt.JwtTokenManager;
 import com.coding.shiro.springboot.example03.common.shiro.cache.ShiroRedisCacheManager;
 import com.coding.shiro.springboot.example03.common.shiro.filter.KickedOutAuthorizationFilter;
 import com.coding.shiro.springboot.example03.common.shiro.filter.RolesOrAuthorizationFilter;
+import com.coding.shiro.springboot.example03.common.shiro.filter.ShiroJwtAuthcFilter;
 import com.coding.shiro.springboot.example03.common.shiro.realm.DefinitionRealm;
+import com.coding.shiro.springboot.example03.common.shiro.session.ShiroJwtSessionManager;
 import com.coding.shiro.springboot.example03.common.shiro.session.ShiroRedisSessionDAO;
 import com.coding.shiro.springboot.example03.domain.service.UsersService;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -32,6 +34,7 @@ public class ShiroConfig {
     private final UsersService usersService;
     private final RedissonClient redissonClient;
     private final ObjectMapper objectMapper;
+    private final JwtTokenManager jwtTokenManager;
 
     @Bean
     ShiroRedisCacheManager shiroRedisCacheManager() {
@@ -55,16 +58,16 @@ public class ShiroConfig {
     }
 
     @Bean
-    public DefaultWebSessionManager defaultWebSessionManager() {
-        DefaultWebSessionManager defaultWebSessionManager = new DefaultWebSessionManager();
-        defaultWebSessionManager.setSessionDAO(shiroRedisSessionDAO());
-        defaultWebSessionManager.setSessionValidationSchedulerEnabled(false); // 默认true
-        defaultWebSessionManager.setSessionValidationInterval(900 * 1000); // 默认1小时
-        defaultWebSessionManager.setSessionIdCookieEnabled(true);
-        defaultWebSessionManager.setGlobalSessionTimeout(600 * 1000); // 默认30分钟；全局超时时间，可以被Subject.getSession().setTimeout(long)覆盖
-        defaultWebSessionManager.setDeleteInvalidSessions(true); // 是否删除无效的Session，默认true
-        defaultWebSessionManager.setSessionIdUrlRewritingEnabled(false); // 取消URL后面的JSESSIONID，默认false
-        return defaultWebSessionManager;
+    public ShiroJwtSessionManager sessionManager() {
+        ShiroJwtSessionManager sessionManager = new ShiroJwtSessionManager(jwtTokenManager);
+        sessionManager.setSessionDAO(shiroRedisSessionDAO());
+        sessionManager.setSessionValidationSchedulerEnabled(false); // 默认true
+        sessionManager.setSessionValidationInterval(900 * 1000); // 默认1小时
+        sessionManager.setSessionIdCookieEnabled(true);
+        sessionManager.setGlobalSessionTimeout(600 * 1000); // 默认30分钟；全局超时时间，可以被Subject.getSession().setTimeout(long)覆盖
+        sessionManager.setDeleteInvalidSessions(true); // 是否删除无效的Session，默认true
+        sessionManager.setSessionIdUrlRewritingEnabled(false); // 取消URL后面的JSESSIONID，默认false
+        return sessionManager;
     }
 
     // 配置SecurityManager
@@ -75,11 +78,8 @@ public class ShiroConfig {
 
         // 将 myRealm 存入 defaultWebSec`urityManager 对象
         webSecurityManager.setRealms(Collections.singletonList(definitionRealm()));
-        // 设置ehCache缓存管理器
-        // webSecurityManager.setCacheManager(ehCacheManager());
-        // webSecurityManager.setCacheManager(shiroRedisCacheManager());
         // 设置Session管理器
-        webSecurityManager.setSessionManager(defaultWebSessionManager());
+        webSecurityManager.setSessionManager(sessionManager());
 
         return webSecurityManager;
     }
@@ -90,6 +90,7 @@ public class ShiroConfig {
         DefaultShiroFilterChainDefinition shiroFilterChainDefinition = new DefaultShiroFilterChainDefinition();
         // 设置不认证可以访问的资源
         shiroFilterChainDefinition.addPathDefinition("/myController/login", "anon"); // 匿名过滤器
+        shiroFilterChainDefinition.addPathDefinition("/jwt/login", "anon"); // 匿名过滤器
         shiroFilterChainDefinition.addPathDefinition("/myController/userLogin", "anon");
         // 设置登出过滤器，其中的具体的退出代码Shiro已经替我们实现了，登出后跳转配置的loginUrl
         shiroFilterChainDefinition.addPathDefinition("/myController/logout", "logout"); // 登出过滤器，【注意】请注意顺序，logout过滤器要在authc之前
@@ -97,7 +98,7 @@ public class ShiroConfig {
         shiroFilterChainDefinition.addPathDefinition("/myController/userLoginRolesCustomFilter",
             "role-or[admin,otherRole]"); // 认证拦截过滤器
         // 设置需要进行登录认证的拦截范围
-        shiroFilterChainDefinition.addPathDefinition("/**", "kicked-out,authc"); // 认证拦截过滤器
+        shiroFilterChainDefinition.addPathDefinition("/**", "kicked-out,jwt-authc"); // 认证拦截过滤器
 
         return shiroFilterChainDefinition;
     }
@@ -109,6 +110,16 @@ public class ShiroConfig {
     }
 
     // ==================================================华丽的分割线==================================================
+
+    private Map<String, Filter> filterMap() {
+        Map<String, Filter> filterMap = new LinkedHashMap<>();
+        filterMap.put("role-or", new RolesOrAuthorizationFilter());
+        filterMap.put("kicked-out",
+            new KickedOutAuthorizationFilter(redissonClient, shiroRedisSessionDAO(), sessionManager()));
+        filterMap.put("jwt-authc", new ShiroJwtAuthcFilter(jwtTokenManager));
+        return filterMap;
+    }
+
     /**
      * ShiroFilterFactoryBean 处理拦截资源文件问题。
      *
@@ -132,11 +143,7 @@ public class ShiroConfig {
         shiroFilterFactoryBean.setUnauthorizedUrl(unauthorizedUrl);
         shiroFilterFactoryBean.setSecurityManager(webSecurityManager());
 
-        Map<String, Filter> filterMap = new LinkedHashMap<>();
-        filterMap.put("role-or", new RolesOrAuthorizationFilter());
-        filterMap.put("kicked-out",
-            new KickedOutAuthorizationFilter(redissonClient, shiroRedisSessionDAO(), defaultWebSessionManager()));
-        shiroFilterFactoryBean.setFilters(filterMap);
+        shiroFilterFactoryBean.setFilters(filterMap());
 
         // 配置不会被拦截的链接 顺序判断
         shiroFilterFactoryBean.setFilterChainDefinitionMap(shiroFilterChainDefinition().getFilterChainMap());

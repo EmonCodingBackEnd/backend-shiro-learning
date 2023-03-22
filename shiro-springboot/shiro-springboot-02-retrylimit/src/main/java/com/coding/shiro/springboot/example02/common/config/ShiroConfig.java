@@ -75,9 +75,6 @@ public class ShiroConfig {
 
         // 将 myRealm 存入 defaultWebSec`urityManager 对象
         webSecurityManager.setRealms(Collections.singletonList(definitionRealm()));
-        // 设置ehCache缓存管理器
-        // webSecurityManager.setCacheManager(ehCacheManager());
-        // webSecurityManager.setCacheManager(shiroRedisCacheManager());
         // 设置Session管理器
         webSecurityManager.setSessionManager(defaultWebSessionManager());
 

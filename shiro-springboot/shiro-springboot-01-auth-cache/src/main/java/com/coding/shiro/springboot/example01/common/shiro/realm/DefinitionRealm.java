@@ -2,14 +2,7 @@ package com.coding.shiro.springboot.example01.common.shiro.realm;
 
 import java.util.List;
 
-import com.coding.shiro.springboot.example01.common.shiro.session.ShiroUser;
-import com.coding.shiro.springboot.example01.common.shiro.token.SimpleToken;
-import com.coding.shiro.springboot.example01.domain.entity.Users;
-import com.coding.shiro.springboot.example01.domain.service.UsersService;
-import org.apache.shiro.authc.AuthenticationException;
-import org.apache.shiro.authc.AuthenticationInfo;
-import org.apache.shiro.authc.AuthenticationToken;
-import org.apache.shiro.authc.SimpleAuthenticationInfo;
+import org.apache.shiro.authc.*;
 import org.apache.shiro.authc.credential.HashedCredentialsMatcher;
 import org.apache.shiro.authz.AuthorizationInfo;
 import org.apache.shiro.authz.SimpleAuthorizationInfo;
@@ -18,6 +11,11 @@ import org.apache.shiro.subject.PrincipalCollection;
 import org.apache.shiro.util.ByteSource;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
+
+import com.coding.shiro.springboot.example01.common.shiro.session.ShiroUser;
+import com.coding.shiro.springboot.example01.common.shiro.token.SimpleToken;
+import com.coding.shiro.springboot.example01.domain.entity.Users;
+import com.coding.shiro.springboot.example01.domain.service.UsersService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -46,7 +44,7 @@ public class DefinitionRealm extends AuthorizingRealm implements ApplicationRunn
             // 3.1.数据库中存放的加盐迭代3次的迭代密码
             pwdInfo = userInfo.getPwd();
         } else {
-            throw new RuntimeException("不合法的用户！");
+            throw new UnknownAccountException("账号不存在！");
         }
         ShiroUser shiroUser = new ShiroUser();
         shiroUser.setId(userInfo.getName());

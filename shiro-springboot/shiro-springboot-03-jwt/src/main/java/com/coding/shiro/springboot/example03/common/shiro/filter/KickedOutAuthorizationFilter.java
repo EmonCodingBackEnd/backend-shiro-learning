@@ -5,8 +5,6 @@ import java.io.Serializable;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 
-import com.coding.shiro.springboot.example03.common.shiro.session.ShiroRedisSessionDAO;
-import com.coding.shiro.springboot.example03.common.shiro.session.ShiroUser;
 import org.apache.shiro.session.ExpiredSessionException;
 import org.apache.shiro.session.Session;
 import org.apache.shiro.session.SessionException;
@@ -14,10 +12,13 @@ import org.apache.shiro.session.UnknownSessionException;
 import org.apache.shiro.session.mgt.DefaultSessionKey;
 import org.apache.shiro.subject.Subject;
 import org.apache.shiro.web.filter.AccessControlFilter;
-import org.apache.shiro.web.session.mgt.DefaultWebSessionManager;
 import org.redisson.api.RDeque;
 import org.redisson.api.RedissonClient;
 import org.springframework.util.ObjectUtils;
+
+import com.coding.shiro.springboot.example03.common.shiro.session.ShiroJwtSessionManager;
+import com.coding.shiro.springboot.example03.common.shiro.session.ShiroRedisSessionDAO;
+import com.coding.shiro.springboot.example03.common.shiro.session.ShiroUser;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -36,7 +37,7 @@ public class KickedOutAuthorizationFilter extends AccessControlFilter {
 
     private final RedissonClient redissonClient;
     private final ShiroRedisSessionDAO shiroRedisSessionDAO;
-    private final DefaultWebSessionManager defaultWebSessionManager;
+    private final ShiroJwtSessionManager defaultWebSessionManager;
 
     @Override
     protected boolean isAccessAllowed(ServletRequest request, ServletResponse response, Object mappedValue)
