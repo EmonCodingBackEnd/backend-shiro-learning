@@ -17,7 +17,6 @@
         <module>shiro-springboot-01-auth-cache</module>
         <module>shiro-springboot-02-retrylimit</module>
         <module>shiro-springboot-03-jwt</module>
-        <module>shiro-springboot-04-distributed-auth</module>
     </modules>
 
     <dependencyManagement>
