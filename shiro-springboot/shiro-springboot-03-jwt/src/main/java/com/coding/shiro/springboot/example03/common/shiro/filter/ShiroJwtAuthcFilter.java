@@ -27,10 +27,11 @@ public class ShiroJwtAuthcFilter extends FormAuthenticationFilter {
         // 如果有，走JWT校验
         if (!ObjectUtils.isEmpty(jwtAuthHeader)) {
             String jwtAuthToken = jwtTokenManager.fetchToken(jwtAuthHeader);
-            boolean verifyJwtToken = jwtTokenManager.verifyJwtToken(jwtAuthToken, 3600);
-            if (verifyJwtToken) {
+            String verifyResult = jwtTokenManager.verifyJwtToken(jwtAuthToken, 3600);
+            if (ObjectUtils.isEmpty(verifyResult)) {
                 return super.isAccessAllowed(request, response, mappedValue);
             } else {
+                request.setAttribute(JwtTokenManager.$X_APP_SESSION_EXP, new JwtUnauthorizedException(verifyResult));
                 return false;
             }
         }
@@ -41,12 +42,9 @@ public class ShiroJwtAuthcFilter extends FormAuthenticationFilter {
 
     @Override
     protected boolean onAccessDenied(ServletRequest request, ServletResponse response) throws Exception {
-        // 判断request请求中是否带有jwt令牌
-        String jwtAuthHeader = WebUtils.toHttp(request).getHeader(JwtTokenManager.TOKEN_HEADER);
-        // 如果有，抛出异常
-        if (!ObjectUtils.isEmpty(jwtAuthHeader)) {
-            request.setAttribute(JwtTokenManager.$X_APP_SESSION_EXP,
-                new JwtUnauthorizedException("jwt token verify failed"));
+        // 如果存在jwt令牌校验异常，继续执行后续过滤器
+        Exception exception = (Exception)request.getAttribute(JwtTokenManager.$X_APP_SESSION_EXP);
+        if (exception != null) {
             return true;
         }
         // 如果没有：走原始方式

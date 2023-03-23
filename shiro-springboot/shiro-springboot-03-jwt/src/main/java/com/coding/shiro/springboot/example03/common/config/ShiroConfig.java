@@ -17,7 +17,6 @@ import org.springframework.context.annotation.Configuration;
 import com.coding.shiro.springboot.example03.common.jwt.JwtTokenManager;
 import com.coding.shiro.springboot.example03.common.shiro.cache.ShiroRedisCacheManager;
 import com.coding.shiro.springboot.example03.common.shiro.filter.KickedOutAuthorizationFilter;
-import com.coding.shiro.springboot.example03.common.shiro.filter.RolesOrAuthorizationFilter;
 import com.coding.shiro.springboot.example03.common.shiro.filter.ShiroJwtAuthcFilter;
 import com.coding.shiro.springboot.example03.common.shiro.realm.DefinitionRealm;
 import com.coding.shiro.springboot.example03.common.shiro.session.ShiroJwtSessionManager;
@@ -89,14 +88,11 @@ public class ShiroConfig {
     public DefaultShiroFilterChainDefinition shiroFilterChainDefinition() {
         DefaultShiroFilterChainDefinition shiroFilterChainDefinition = new DefaultShiroFilterChainDefinition();
         // 设置不认证可以访问的资源
-        shiroFilterChainDefinition.addPathDefinition("/myController/login", "anon"); // 匿名过滤器
-        shiroFilterChainDefinition.addPathDefinition("/jwt/login", "anon"); // 匿名过滤器
-        shiroFilterChainDefinition.addPathDefinition("/myController/userLogin", "anon");
+        shiroFilterChainDefinition.addPathDefinition("/myController/login", "anon"); // 前后端不分离跳转到登录页面匿名访问
+        shiroFilterChainDefinition.addPathDefinition("/myController/userLogin", "anon"); // 前后端不分离登录认证匿名访问
         // 设置登出过滤器，其中的具体的退出代码Shiro已经替我们实现了，登出后跳转配置的loginUrl
         shiroFilterChainDefinition.addPathDefinition("/myController/logout", "logout"); // 登出过滤器，【注意】请注意顺序，logout过滤器要在authc之前
-        // 使用自定义过滤器
-        shiroFilterChainDefinition.addPathDefinition("/myController/userLoginRolesCustomFilter",
-            "role-or[admin,otherRole]"); // 认证拦截过滤器
+        shiroFilterChainDefinition.addPathDefinition("/jwt/login", "anon"); // 前后端分离登录认证匿名访问
         // 设置需要进行登录认证的拦截范围
         shiroFilterChainDefinition.addPathDefinition("/**", "kicked-out,jwt-authc"); // 认证拦截过滤器
 
@@ -113,7 +109,6 @@ public class ShiroConfig {
 
     private Map<String, Filter> filterMap() {
         Map<String, Filter> filterMap = new LinkedHashMap<>();
-        filterMap.put("role-or", new RolesOrAuthorizationFilter());
         filterMap.put("kicked-out",
             new KickedOutAuthorizationFilter(redissonClient, shiroRedisSessionDAO(), sessionManager()));
         filterMap.put("jwt-authc", new ShiroJwtAuthcFilter(jwtTokenManager));

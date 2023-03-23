@@ -134,8 +134,9 @@ public class JwtTokenManager {
      * @return - 令牌中携带的非隐私数据
      */
     public DecodedJWT decodeJwtToken(String jwtToken) {
+        DecodedJWT jwt;
         try {
-            DecodedJWT jwt = JWT.decode(jwtToken);
+            jwt = JWT.decode(jwtToken);
             return jwt;
         } catch (JWTDecodeException e) {
             log.error("解码失败", e);
@@ -148,8 +149,10 @@ public class JwtTokenManager {
      * 
      * @param jwtToken 令牌字符串
      * @param expireLeewayInSeconds 令牌过期的容忍时间，过期时间不大于该值，认为有效
+     * @return - 如果返回空字符串，表示成功；否则，返回错误原因。
      */
-    public boolean verifyJwtToken(String jwtToken, long expireLeewayInSeconds) {
+    public String verifyJwtToken(String jwtToken, long expireLeewayInSeconds) {
+        String verifyResult = "";
         try {
             String hexEncodedSecuretKey =
                 Hex.encodeToString(jwtProperties.getHexEncodedSecretKey().getBytes(StandardCharsets.UTF_8));
@@ -160,25 +163,27 @@ public class JwtTokenManager {
             }
             JWTVerifier verifier = verification.build(); // Reusable verifier instance
             verifier.verify(jwtToken);
-            return true;
+            return verifyResult;
         } catch (JWTVerificationException e) {
+            log.error("token验证异常", e);
             if (e instanceof TokenExpiredException) {
-                log.error("已过期", e);
+                verifyResult = String.format("token已过期:%s", e.getMessage());
             } else if (e instanceof SignatureVerificationException) {
-                log.error("签名无效", e);
+                verifyResult = String.format("token签名无效:%s", e.getMessage());
             } else if (e instanceof JWTDecodeException) {
-                log.error("解码失败", e);
+                verifyResult = String.format("token解码失败:%s", e.getMessage());
             } else {
                 // Invalid signature/claims
-                log.error("异常", e);
+                verifyResult = String.format("token验证失败:%s", e.getMessage());
             }
-            return false;
+            return verifyResult;
         }
     }
 
     public static void main(String[] args) {
         JwtTokenManager jwtTokenManager = new JwtTokenManager(new JwtProperties());
-        String jwtToken = jwtTokenManager.issueJwtToken("61e3af70-8333-4f94-8654-6116b4abdbe6", "emon", null, 3600 * 1000);
+        String jwtToken =
+            jwtTokenManager.issueJwtToken("61e3af70-8333-4f94-8654-6116b4abdbe6", "emon", null, 3600 * 1000);
         System.out.println(jwtToken);
     }
 }

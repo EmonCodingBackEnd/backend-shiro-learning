@@ -52,14 +52,6 @@ public class MyController {
         return "验证角色成功！";
     }
 
-    // 登录认证自定义过滤验证角色
-    @GetMapping("/myController/userLoginRolesCustomFilter")
-    @ResponseBody
-    public String userLoginRolesCustomFilter() {
-        System.out.println("登录认证自定义过滤验证角色");
-        return "自定义过滤验证角色成功！";
-    }
-
     // 登录认证验证权限
     @RequiresPermissions({"user:edit", "user:delete"})
     @GetMapping("/myController/userLoginPss")

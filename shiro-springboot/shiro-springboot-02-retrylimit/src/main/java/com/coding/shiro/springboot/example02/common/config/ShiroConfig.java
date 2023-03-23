@@ -17,7 +17,6 @@ import org.springframework.context.annotation.Configuration;
 
 import com.coding.shiro.springboot.example02.common.shiro.cache.ShiroRedisCacheManager;
 import com.coding.shiro.springboot.example02.common.shiro.filter.KickedOutAuthorizationFilter;
-import com.coding.shiro.springboot.example02.common.shiro.filter.RolesOrAuthorizationFilter;
 import com.coding.shiro.springboot.example02.common.shiro.realm.DefinitionRealm;
 import com.coding.shiro.springboot.example02.common.shiro.session.ShiroRedisSessionDAO;
 import com.coding.shiro.springboot.example02.domain.service.UsersService;
@@ -86,13 +85,10 @@ public class ShiroConfig {
     public DefaultShiroFilterChainDefinition shiroFilterChainDefinition() {
         DefaultShiroFilterChainDefinition shiroFilterChainDefinition = new DefaultShiroFilterChainDefinition();
         // 设置不认证可以访问的资源
-        shiroFilterChainDefinition.addPathDefinition("/myController/login", "anon"); // 匿名过滤器
-        shiroFilterChainDefinition.addPathDefinition("/myController/userLogin", "anon");
+        shiroFilterChainDefinition.addPathDefinition("/myController/login", "anon"); // 前后端不分离跳转到登录页面匿名访问
+        shiroFilterChainDefinition.addPathDefinition("/myController/userLogin", "anon"); // 前后端不分离登录认证匿名访问
         // 设置登出过滤器，其中的具体的退出代码Shiro已经替我们实现了，登出后跳转配置的loginUrl
         shiroFilterChainDefinition.addPathDefinition("/myController/logout", "logout"); // 登出过滤器，【注意】请注意顺序，logout过滤器要在authc之前
-        // 使用自定义过滤器
-        shiroFilterChainDefinition.addPathDefinition("/myController/userLoginRolesCustomFilter",
-            "role-or[admin,otherRole]"); // 认证拦截过滤器
         // 设置需要进行登录认证的拦截范围
         shiroFilterChainDefinition.addPathDefinition("/**", "kicked-out,authc"); // 认证拦截过滤器
 
@@ -106,6 +102,14 @@ public class ShiroConfig {
     }
 
     // ==================================================华丽的分割线==================================================
+
+    private Map<String, Filter> filterMap() {
+        Map<String, Filter> filterMap = new LinkedHashMap<>();
+        filterMap.put("kicked-out",
+            new KickedOutAuthorizationFilter(redissonClient, shiroRedisSessionDAO(), defaultWebSessionManager()));
+        return filterMap;
+    }
+
     /**
      * ShiroFilterFactoryBean 处理拦截资源文件问题。
      *
@@ -129,11 +133,7 @@ public class ShiroConfig {
         shiroFilterFactoryBean.setUnauthorizedUrl(unauthorizedUrl);
         shiroFilterFactoryBean.setSecurityManager(webSecurityManager());
 
-        Map<String, Filter> filterMap = new LinkedHashMap<>();
-        filterMap.put("role-or", new RolesOrAuthorizationFilter());
-        filterMap.put("kicked-out",
-            new KickedOutAuthorizationFilter(redissonClient, shiroRedisSessionDAO(), defaultWebSessionManager()));
-        shiroFilterFactoryBean.setFilters(filterMap);
+        shiroFilterFactoryBean.setFilters(filterMap());
 
         // 配置不会被拦截的链接 顺序判断
         shiroFilterFactoryBean.setFilterChainDefinitionMap(shiroFilterChainDefinition().getFilterChainMap());
