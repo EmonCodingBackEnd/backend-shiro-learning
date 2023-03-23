@@ -36,6 +36,7 @@ public class ShiroJwtSessionManager extends DefaultWebSessionManager {
             String jwtAuthToken = jwtTokenManager.fetchToken(jwtAuthHeader);
             String jwtId;
             try {
+                // jwt令牌解码失败，直接返回null处理，交给后续的 ShiroJwtAuthcFilter 插件执行严格拦截
                 DecodedJWT decodedJWT = jwtTokenManager.decodeJwtToken(jwtAuthToken);
                 jwtId = decodedJWT.getId();
             } catch (Exception e) {

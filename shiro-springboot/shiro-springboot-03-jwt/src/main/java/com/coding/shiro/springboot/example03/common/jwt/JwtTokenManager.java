@@ -139,7 +139,7 @@ public class JwtTokenManager {
             jwt = JWT.decode(jwtToken);
             return jwt;
         } catch (JWTDecodeException e) {
-            log.error("解码失败", e);
+            log.error("token解码失败！", e);
             throw e;
         }
     }

@@ -67,14 +67,6 @@ public class MyController {
         return "验证角色成功！";
     }
 
-    // 登录认证自定义过滤验证角色
-    @GetMapping("/myController/userLoginRolesCustomFilter")
-    @ResponseBody
-    public String userLoginRolesCustomFilter() {
-        System.out.println("登录认证自定义过滤验证角色");
-        return "自定义过滤验证角色成功！";
-    }
-
     // 登录认证验证权限
     @RequiresPermissions({"user:edit", "user:delete"})
     @GetMapping("/myController/userLoginPss")
@@ -89,6 +81,7 @@ public class MyController {
     @GetMapping("/jwt/login")
     @ResponseBody
     public String jwtLogin(String name, String pwd, HttpSession session) {
+        String jwtToken;
         // 1.获取 Subject 对象
         Subject subject = SecurityUtils.getSubject();
         // 2.封装请求数据到 token
@@ -102,7 +95,7 @@ public class MyController {
             ShiroUser shiroUser = (ShiroUser)subject.getPrincipal();
             Map<String, Object> claims = new HashMap<>();
             claims.put("shiroUser", JSONObject.toJSONString(shiroUser));
-            String jwtToken = jwtTokenManager.issueJwtToken(sessionId.toString(), shiroUser.getId(), claims,
+            jwtToken = jwtTokenManager.issueJwtToken(sessionId.toString(), shiroUser.getId(), claims,
                 subject.getSession().getTimeout());
             return jwtToken;
         } catch (AuthenticationException e) {
@@ -119,7 +112,7 @@ public class MyController {
         return "jwt验证角色成功！";
     }
 
-    @RequiresPermissions({"user:edit", "user:delete1"})
+    @RequiresPermissions({"user:edit", "user:delete", "user:non-existent"})
     @GetMapping("/jwt/perms")
     @ResponseBody
     public String jwtPerms() {
