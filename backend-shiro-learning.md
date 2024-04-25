@@ -86,7 +86,7 @@ Realm领域[rɛlm]，相当于DataSource数据源。SecurityManager进行安全�
 
 如果用户身份数据在数据库，那么Realm就需要从数据库获取用户身份信息。
 
-注意：不要把Realm理解成只是从数据源取数据，在Realm中海油认证授权校验的相关的代码。
+注意：不要把Realm理解成只是从数据源取数据，在Realm中还有认证授权校验的相关的代码。
 
 ### SessionManager(会话管理器)
 
